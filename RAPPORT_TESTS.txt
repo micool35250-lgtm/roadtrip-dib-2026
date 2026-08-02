@@ -1,22 +1,17 @@
-ROADTRIP DIB 2026 — CONTRÔLES EFFECTUÉS
+ROADTRIP DIB — RAPPORT DE CONTRÔLE V1
 
-Version : hébergements intégrés
+Contrôles effectués :
+- 17 journées présentes.
+- 8 hébergements présents avec adresse et horaires.
+- Aucun identifiant HTML dupliqué.
+- Syntaxe JavaScript validée avec Node.js.
+- manifest.webmanifest valide.
+- service worker présent et cache mis à jour.
+- Icônes 192 px et 512 px présentes.
+- Aucun numéro de réservation, code confidentiel ou code de serrure intégré.
 
-Contrôles automatiques réussis :
-- archive et structure des fichiers ;
-- syntaxe JavaScript avec Node.js ;
-- présence des 17 journées ;
-- présence des 8 hébergements et de leurs adresses ;
-- présence des 4 onglets : Itinéraire, Carte, Restos, Courses ;
-- présence de la météo locale ;
-- présence des 17 badges ;
-- présence du SOS ;
-- présence des liens Apple Plans et Google Maps ;
-- manifeste PWA et service worker présents.
+Fonctions prévues : itinéraire, carte, météo locale, restaurants, courses,
+SOS, position de voiture, badges et mode local/Firebase.
 
-À valider sur iPhone après publication HTTPS :
-- autorisation GPS Safari ;
-- météo de la position ;
-- recherche Restaurants/Courses via OpenStreetMap ;
-- installation sur l’écran d’accueil ;
-- synchronisation Firebase après configuration.
+À contrôler sur iPhone après publication HTTPS : autorisation GPS, affichage
+Leaflet, météo, recherche Overpass et installation sur l’écran d’accueil.
