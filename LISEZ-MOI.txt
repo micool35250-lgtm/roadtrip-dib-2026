@@ -1,0 +1,26 @@
+ROADTRIP DIB 2026 — VERSION FAMILLE
+
+CONTENU
+- index.html : application complète
+- manifest.webmanifest : installation sur iPhone
+- service-worker.js : cache de base / mode dégradé hors ligne
+- icons/ : icônes de l'application
+- RAPPORT_TESTS.txt : contrôles effectués
+- FIREBASE_INSTALLATION.txt : activation de la synchronisation familiale
+- firebase-config.js : paramètres Firebase
+
+MISE EN LIGNE SUR GITHUB
+Téléverser LE CONTENU de ce dossier à la racine du dépôt : index.html doit être visible directement sur la page principale du dépôt. Conserver le dossier icons avec ses fichiers.
+
+INSTALLATION IPHONE
+Après activation de GitHub Pages, ouvrir l'adresse HTTPS dans Safari, puis Partager > Sur l'écran d'accueil > Ajouter.
+
+IMPORTANT
+La carte, la recherche autour de soi et la géolocalisation nécessitent Internet et l'autorisation de localisation. Les recherches utilisent OpenStreetMap/Overpass avec un repli vers Google Maps.
+
+
+MÉTÉO
+La carte météo utilise Open-Meteo, sans clé API. Elle demande la position seulement lorsqu’on la touche.
+
+BADGES
+Les 17 badges sont actifs immédiatement. Sans Firebase, ils sont enregistrés séparément sur chaque iPhone.

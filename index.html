@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RoadTrip Dib">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#12213D">
+<title>RoadTrip Dib — Europe 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{
+    --navy:#12213D;
+    --navy-deep:#0A1526;
+    --brass:#C9A05C;
+    --brass-soft:#E4C98A;
+    --teal:#3F6C63;
+    --paper:#EFE7D5;
+    --paper-card:#F7F2E5;
+    --ink:#1B1B1B;
+    --ink-soft:#5B564A;
+    --line: rgba(18,33,61,0.14);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; background:var(--navy-deep);}
+  body{
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom: 48px;
+  }
+
+  /* Header */
+  header{
+    background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+    color: var(--paper);
+    padding: calc(env(safe-area-inset-top) + 22px) 22px 26px;
+    position: sticky;
+    top:0;
+    z-index: 10;
+    border-bottom: 1px solid rgba(201,160,92,0.35);
+  }
+  .eyebrow{
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass-soft);
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1.15;
+    margin: 0 0 10px;
+  }
+  .route-line{
+    font-size: 12.5px;
+    color: rgba(239,231,213,0.68);
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+  .progress-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .progress-track{
+    flex:1;
+    height:5px;
+    background: rgba(239,231,213,0.15);
+    border-radius: 3px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background: var(--brass);
+    border-radius:3px;
+    transition: width .4s ease;
+  }
+  .progress-label{
+    font-size: 11.5px;
+    color: var(--brass-soft);
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+  /* Timeline */
+  main{
+    background: var(--paper);
+    padding: 22px 16px 10px;
+  }
+  .timeline{
+    position:relative;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left: 27px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .day{
+    position:relative;
+    padding-left: 56px;
+    margin-bottom: 14px;
+  }
+  .day-dot{
+    position:absolute;
+    left: 18px;
+    top: 22px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--paper-card);
+    border: 2px solid var(--brass);
+    z-index: 2;
+    transition: background .2s, border-color .2s;
+  }
+  .day.done .day-dot{
+    background: var(--brass);
+  }
+  .day.today .day-dot{
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(63,108,99,0.18);
+  }
+
+  .card{
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(18,33,61,0.05);
+    overflow: hidden;
+  }
+  .day.today .card{
+    border-color: var(--teal);
+    box-shadow: 0 2px 10px rgba(63,108,99,0.18);
+  }
+
+  .card-head{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select:none;
+  }
+  .check{
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: transparent;
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .day.done .check{
+    background: var(--teal);
+    border-color: var(--teal);
+    color: white;
+  }
+  .head-text{ flex:1; min-width:0; }
+  .head-top{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    flex-wrap: wrap;
+  }
+  .jour-num{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 14px;
+    color: var(--teal);
+    letter-spacing: 0.02em;
+  }
+  .date-txt{
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .ville{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size: 17px;
+    margin-top: 1px;
+  }
+  .stamp{
+    flex: 0 0 auto;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brass);
+    border: 1.3px solid var(--brass);
+    border-radius: 6px;
+    padding: 4px 7px;
+    transform: rotate(-4deg);
+    white-space: nowrap;
+  }
+  .chevron{
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-right: 1.5px solid var(--ink-soft);
+    border-bottom: 1.5px solid var(--ink-soft);
+    transform: rotate(-45deg);
+    transition: transform .2s;
+    margin-left: 2px;
+  }
+  .day.open .chevron{
+    transform: rotate(45deg);
+  }
+
+  .card-body{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .28s ease;
+  }
+  .day.open .card-body{
+    max-height: 900px;
+  }
+  .card-body-inner{
+    padding: 0 16px 16px 16px;
+    border-top: 1px solid var(--line);
+    margin-top: -1px;
+    padding-top: 12px;
+  }
+  .addr{
+    font-size: 12.5px;
+    color: var(--teal);
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .addr span{
+    display:block;
+    color: var(--ink-soft);
+    font-weight: 400;
+    font-size: 12px;
+    margin-top: 1px;
+  }
+  ul.prog{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  ul.prog li{
+    position: relative;
+    padding-left: 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin-bottom: 7px;
+    color: var(--ink);
+  }
+  ul.prog li::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top: 7px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--brass);
+  }
+  ul.prog li.strong{
+    font-weight: 700;
+    color: var(--navy);
+  }
+  ul.prog li.italic{
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  footer{
+    text-align:center;
+    padding: 22px 20px 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Tabs */
+  .tabs{
+    display:flex;
+    gap: 6px;
+    margin-top: 16px;
+  }
+  .tab-btn{
+    flex:1;
+    background: rgba(239,231,213,0.08);
+    border: 1px solid rgba(201,160,92,0.35);
+    color: rgba(239,231,213,0.75);
+    font-family:'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .tab-btn.active{
+    background: var(--brass);
+    border-color: var(--brass);
+    color: var(--navy-deep);
+  }
+
+  /* Map view */
+  .map-view{
+    display:none;
+    position: relative;
+    height: calc(100vh - 172px);
+    min-height: 420px;
+  }
+  .map-view.active{ display:block; }
+  #map{
+    width: 100%;
+    height: 100%;
+    background: var(--paper);
+  }
+  .locate-btn{
+    position:absolute;
+    bottom: 18px;
+    right: 16px;
+    z-index: 500;
+    background: var(--navy);
+    color: var(--paper);
+    border: 1px solid var(--brass);
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size: 12.5px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    box-shadow: 0 3px 10px rgba(18,33,61,0.3);
+    cursor:pointer;
+  }
+  .stop-pin{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50% 50% 50% 0;
+    background: var(--navy);
+    border: 2px solid var(--brass);
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 5px rgba(18,33,61,0.35);
+  }
+  .stop-pin span{
+    transform: rotate(45deg);
+    color: var(--brass-soft);
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 10px;
+  }
+  .leaflet-popup-content-wrapper{
+    background: var(--paper-card);
+    border-radius: 10px;
+  }
+  .leaflet-popup-content{
+    font-family:'Work Sans', sans-serif;
+    font-size: 12.5px;
+    color: var(--ink);
+    margin: 10px 12px;
+  }
+  .popup-title{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 14px;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .leaflet-popup-tip{ background: var(--paper-card); }
+
+  /* Restaurants tab */
+  .resto-view{ display:none; }
+  .resto-view.active{ display:block; }
+
+  .resto-subtabs{
+    display:flex;
+    gap: 8px;
+    padding: 14px 16px 4px;
+    background: var(--paper);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .subtab-btn{
+    flex:1;
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family:'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    cursor:pointer;
+  }
+  .subtab-btn.active{
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--paper);
+  }
+
+  .curated-panel{
+    display:none;
+    background: var(--paper);
+    padding: 14px 16px 26px;
+  }
+  .curated-panel.active{ display:block; }
+
+  .city-group{
+    max-width: 640px;
+    margin: 0 auto 22px;
+  }
+  .city-group h3{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size: 15px;
+    color: var(--navy);
+    margin: 0 0 10px;
+    padding-left: 2px;
+  }
+  .resto-card{
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 9px;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+  }
+  .resto-info{ flex:1; min-width:0; }
+  .resto-name{
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .resto-meta{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .resto-rating{
+    color: var(--brass);
+    font-weight: 700;
+  }
+  .resto-link{
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--navy);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--brass-soft);
+    text-decoration:none;
+    font-size: 15px;
+  }
+
+  .nearby-panel{
+    display:none;
+    position: relative;
+    height: calc(100vh - 220px);
+    min-height: 400px;
+  }
+  .nearby-panel.active{ display:block; }
+  #restoMap{
+    width:100%;
+    height:100%;
+    background: var(--paper);
+  }
+  .resto-pin{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50% 50% 50% 0;
+    background: var(--teal);
+    border: 2px solid var(--paper-card);
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 5px rgba(18,33,61,0.35);
+    font-size: 12px;
+  }
+  .resto-pin span{ transform: rotate(45deg); }
+  .resto-pin-gold{
+    background: var(--brass);
+    border-color: var(--navy);
+    width: 26px;
+    height: 26px;
+  }
+  .resto-pin-gold span{ color: var(--navy-deep); font-size: 13px; }
+  .nearby-hint{
+    position:absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 500;
+    background: rgba(18,33,61,0.92);
+    color: var(--paper);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align:center;
+  }
+
+  /* Version famille : courses, actions et SOS */
+  .tabs{ overflow-x:auto; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab-btn{ min-width:76px; padding-left:7px; padding-right:7px; }
+  .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .action-link,.action-btn{border:0;border-radius:999px;padding:9px 12px;font:600 12px 'Work Sans',sans-serif;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+  .action-link.apple{background:var(--navy);color:var(--paper)}
+  .action-link.google{background:var(--teal);color:white}
+  .action-btn.car{background:var(--brass);color:var(--navy-deep)}
+  .course-view{display:none;background:var(--paper);min-height:calc(100vh - 172px)}
+  .course-view.active{display:block}
+  .course-toolbar{max-width:640px;margin:0 auto;padding:14px 16px 8px;display:flex;gap:8px;overflow-x:auto}
+  .filter-chip{border:1px solid var(--line);background:var(--paper-card);color:var(--ink-soft);border-radius:999px;padding:8px 11px;font:600 12px 'Work Sans';white-space:nowrap}
+  .filter-chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+  .course-map-wrap{position:relative;height:calc(100vh - 250px);min-height:410px}
+  #courseMap{height:100%;width:100%}
+  .course-status{position:absolute;z-index:500;top:10px;left:12px;right:12px;background:rgba(18,33,61,.93);color:var(--paper);padding:9px 12px;border-radius:9px;font-size:12px;text-align:center}
+  .shop-pin{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50% 50% 50% 0;background:#8b4d7d;border:2px solid var(--paper-card);transform:rotate(-45deg);box-shadow:0 2px 5px rgba(18,33,61,.35)}
+  .shop-pin span{transform:rotate(45deg);font-size:12px}
+  .sos-fab{position:fixed;z-index:1200;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.65);background:#a92c32;color:#fff;font-weight:800;font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer}
+  .modal-backdrop{display:none;position:fixed;inset:0;z-index:1500;background:rgba(10,21,38,.72);padding:calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));align-items:flex-end;justify-content:center}
+  .modal-backdrop.open{display:flex}
+  .sos-sheet{width:min(100%,560px);background:var(--paper-card);border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+  .sos-sheet h2{font-family:'Fraunces',serif;color:var(--navy);margin:0 0 5px}
+  .sos-sheet p{font-size:12px;color:var(--ink-soft);margin:0 0 14px}
+  .sos-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .sos-action{border:0;border-radius:12px;padding:12px 10px;background:var(--navy);color:white;text-decoration:none;text-align:center;font:700 13px 'Work Sans'}
+  .sos-action.red{background:#a92c32}
+  .sos-action.gold{background:var(--brass);color:var(--navy-deep)}
+  .sos-close{width:100%;margin-top:10px;border:1px solid var(--line);background:transparent;padding:10px;border-radius:12px;font-weight:700;color:var(--ink-soft)}
+  .toast{position:fixed;z-index:2000;left:50%;bottom:78px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:white;padding:10px 14px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-color-scheme:dark){
+    :root{--paper:#171b22;--paper-card:#222832;--ink:#f4efe4;--ink-soft:#bbb4a6;--line:rgba(239,231,213,.13)}
+    html,body{background:#0a101a}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--paper-card)}
+  }
+
+  .family-bar{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .family-chip{border:1px solid rgba(201,160,92,.35);background:rgba(239,231,213,.08);color:var(--paper);border-radius:999px;padding:6px 10px;font:600 11px 'Work Sans';cursor:pointer}
+  .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#d59b3b;margin-right:5px}
+  .sync-dot.online{background:#52b788}.sync-dot.offline{background:#d65a5a}
+  .badge-card{display:flex;align-items:center;gap:12px;background:var(--paper-card);border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:8px}
+  .badge-icon{font-size:26px}.badge-card.locked{opacity:.42;filter:grayscale(1)}
+  .badge-title{font-weight:700;font-size:13px}.badge-sub{font-size:11px;color:var(--ink-soft);margin-top:2px}
+  .badge-celebration{position:fixed;z-index:2100;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:var(--navy);color:white;border:2px solid var(--brass);border-radius:18px;padding:20px;text-align:center;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+  .badge-celebration.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .badge-celebration .big{font-size:42px}.badge-celebration strong{display:block;margin-top:5px;font-family:'Fraunces';font-size:18px}
+
+  .weather-card{margin-top:10px;border:1px solid rgba(201,160,92,.35);background:rgba(239,231,213,.08);border-radius:12px;padding:10px 12px;color:var(--paper);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;width:100%}
+  .weather-icon{font-size:28px;line-height:1}.weather-main{flex:1;min-width:0}.weather-title{font-weight:700;font-size:12px}.weather-detail{font-size:11px;color:rgba(239,231,213,.72);margin-top:2px}.weather-temp{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--brass-soft)}
+
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">5 — 20 août 2026</p>
+  <h1>RoadTrip Dib <span style="font-size:.72em;color:var(--brass-soft)">Europe 2026</span></h1>
+  <p class="route-line">Strasbourg → Europa-Park → Stuttgart → Nuremberg → Leipzig → Berlin → Amsterdam → Bruxelles</p>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 17</div>
+  </div>
+  <div class="family-bar">
+    <button class="family-chip" id="badgesBtn">🏆 Badges <span id="badgeCount">0</span>/17</button>
+    <button class="family-chip" id="syncBtn"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Mode local</span></button>
+  </div>
+  <button class="weather-card" id="weatherCard" type="button" aria-label="Afficher la météo locale">
+    <span class="weather-icon" id="weatherIcon">🌤️</span>
+    <span class="weather-main"><span class="weather-title" id="weatherTitle">Météo locale</span><span class="weather-detail" id="weatherDetail">Touchez pour utiliser votre position</span></span>
+    <span class="weather-temp" id="weatherTemp">--°</span>
+  </button>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="list" id="tabBtnList">Itinéraire</button>
+    <button class="tab-btn" data-tab="map" id="tabBtnMap">Carte</button>
+    <button class="tab-btn" data-tab="resto" id="tabBtnResto">Restos</button>
+    <button class="tab-btn" data-tab="course" id="tabBtnCourse">Courses</button>
+  </div>
+</header>
+
+<main id="listView">
+  <div class="timeline" id="timeline"></div>
+</main>
+
+<div id="mapView" class="map-view">
+  <div id="map"></div>
+  <button id="locateBtn" class="locate-btn">📍 Me localiser</button>
+</div>
+
+<div id="restoView" class="resto-view">
+  <div class="resto-subtabs">
+    <button class="subtab-btn active" id="subtabCurated">Sélection du voyage</button>
+    <button class="subtab-btn" id="subtabNearby">Autour de moi</button>
+  </div>
+
+  <div id="curatedPanel" class="curated-panel"></div>
+
+  <div id="nearbyPanel" class="nearby-panel">
+    <div id="restoMap"></div>
+    <button id="restoLocateBtn" class="locate-btn">📍 Chercher ici</button>
+  </div>
+</div>
+
+
+<div id="courseView" class="course-view">
+  <div class="course-toolbar" aria-label="Filtres commerces">
+    <button class="filter-chip active" data-shop="all">Tout</button>
+    <button class="filter-chip" data-shop="supermarket">Supermarchés</button>
+    <button class="filter-chip" data-shop="bakery">Boulangeries</button>
+    <button class="filter-chip" data-shop="convenience">Épiceries</button>
+    <button class="filter-chip" data-shop="butcher">Boucheries</button>
+  </div>
+  <div class="course-map-wrap">
+    <div id="courseStatus" class="course-status">Appuie sur « Trouver des courses » pour chercher autour de toi.</div>
+    <div id="courseMap"></div>
+    <button id="courseLocateBtn" class="locate-btn">🛒 Trouver des courses</button>
+  </div>
+</div>
+
+<div id="badgesModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="badgesTitle">
+  <div class="sos-sheet">
+    <h2 id="badgesTitle">Badges du voyage</h2>
+    <p>Chaque journée terminée débloque un souvenir.</p>
+    <div id="badgesList"></div>
+    <button class="sos-close" id="badgesCloseBtn">Fermer</button>
+  </div>
+</div>
+<div id="badgeCelebration" class="badge-celebration"><div class="big" id="celebrationIcon">🏆</div><strong id="celebrationTitle"></strong><span>Badge débloqué !</span></div>
+<button id="sosBtn" class="sos-fab" aria-label="Urgence SOS">SOS</button>
+<div id="sosModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sosTitle">
+  <div class="sos-sheet">
+    <h2 id="sosTitle">Urgence</h2>
+    <p>Le 112 fonctionne dans toute l’Union européenne. Ta position peut être copiée ou ouverte dans Plans.</p>
+    <div class="sos-grid">
+      <a class="sos-action red" href="tel:112">📞 Appeler le 112</a>
+      <button class="sos-action gold" id="copyPositionBtn">📍 Copier ma position</button>
+      <button class="sos-action" id="hospitalBtn">🏥 Hôpital proche</button>
+      <button class="sos-action" id="pharmacyBtn">💊 Pharmacie proche</button>
+    </div>
+    <button class="sos-close" id="sosCloseBtn">Fermer</button>
+  </div>
+</div>
+<div id="toast" class="toast" role="status"></div>
+
+<footer id="listFooter">Touche une case pour cocher un jour • Touche une carte pour l'ouvrir</footer>
+
+<script>
+const days = [
+  { n:1, date:"Mer. 5 août", ville:"Strasbourg", addr:"13 rue Jean-Paul de Dadelsen", addr2:"Trajet : Chevaigné → Strasbourg", prog:[
+    {t:"Installation dans le logement"},
+    {t:"Balade : Petite France, ponts couverts, barrage Vauban (terrasse panoramique gratuite)"}
+  ]},
+  { n:2, date:"Jeu. 6 août", ville:"Strasbourg", addr:null, prog:[
+    {t:"Matin : cathédrale (entrée gratuite), horloge astronomique, Palais Rohan, place Gutenberg, ruelles du centre"},
+    {t:"Déjeuner"},
+    {t:"AM : Batorama (embarcadère près du Palais Rohan)"},
+    {t:"Départ pour Rust (1h de route)", cls:"strong"}
+  ]},
+  { n:3, date:"Ven. 7 août", ville:"Europa-Park", addr:"Hindenburgstrasse 3, 77977 Rust", prog:[
+    {t:"Journée Europa-Park"}
+  ]},
+  { n:4, date:"Sam. 8 août", ville:"Europa-Park", addr:"Hindenburgstrasse 3, 77977 Rust", prog:[
+    {t:"Journée Europa-Park"},
+    {t:"Départ pour Stuttgart (2h)", cls:"strong"},
+    {t:"Hôtel : Marbacherstrasse 32"}
+  ]},
+  { n:5, date:"Dim. 9 août", ville:"Stuttgart", addr:"Marbacherstrasse 32", prog:[
+    {t:"Matin : musée Mercedes — U-Bahn (VVS) direction Mercedesstrasse / NeckarPark, prendre un billet groupe journée (Gruppentages Ticket)"},
+    {t:"Retour : S-Bahn ou U-Bahn vers Stadtmitte"},
+    {t:"Balade : Schlossplatz, Königstrasse"},
+    {t:"Départ pour Nuremberg (2h30)", cls:"strong"}
+  ]},
+  { n:6, date:"Lun. 10 août", ville:"Nuremberg", addr:"Tafelfeldstrasse 21", prog:[
+    {t:"À pied jusqu'à Nürnberg Hauptbahnhof (10-15 min), puis tram ligne 8 direction Doku-Zentrum, arrêt Doku-Zentrum"},
+    {t:"Matin : Centre de documentation du parti nazi (Reichsparteitagsgelände)"},
+    {t:"Zeppelinfeld et tribune Zeppelin"},
+    {t:"Déjeuner"},
+    {t:"Palais de Justice — Salle 600 (billets groupés déjà achetés, dans le wallet)", cls:"strong"}
+  ]},
+  { n:7, date:"Mar. 11 août", ville:"Nuremberg", addr:"Tafelfeldstrasse 21", prog:[
+    {t:"Pas besoin de transport", cls:"italic"},
+    {t:"Château impérial (Kaiserburg), descente vers la vieille ville, Hauptmarkt, Belle Fontaine, ruelles médiévales, pont Henkersteg"},
+    {t:"Déjeuner : brasserie traditionnelle (Nürnberger Rostbratwürste)"},
+    {t:"Départ pour Leipzig", cls:"strong"}
+  ]},
+  { n:8, date:"Mer. 12 août", ville:"Leipzig", addr:"Seelenbinderstrasse 4", prog:[
+    {t:"Nikolaikirche, Augustusplatz, quartier de Plagwitz"},
+    {t:"Départ pour Berlin (2h)", cls:"strong"},
+    {t:"Télécharger BVG Fahrinfo et DB Navigator ; si besoin, ticket groupe journée (jusqu'à 5 pers.)"}
+  ]},
+  { n:9, date:"Jeu. 13 août", ville:"Berlin — historique", addr:"Pflugstrasse 4", prog:[
+    {t:"Mémorial de l'Holocauste"},
+    {t:"Tiergarten"},
+    {t:"Potsdamer Platz"},
+    {t:"Porte de Brandebourg"},
+    {t:"Reichstag — coupole réservée 15h15 (billets dans les mails)", cls:"strong"}
+  ]},
+  { n:10, date:"Ven. 14 août", ville:"Berlin — côté mur", addr:"Pflugstrasse 4", prog:[
+    {t:"U-Bahn U8 Rosenthaler Platz direction Wittenau, descendre à Bernauer Strasse"},
+    {t:"Bernauer Strasse"},
+    {t:"Pour Topographie de la Terreur : U8 direct Stadtmitte"},
+    {t:"Déjeuner"},
+    {t:"10 min à pied → Checkpoint Charlie, puis musée"}
+  ]},
+  { n:11, date:"Sam. 15 août", ville:"Berlin — à pied", addr:"Pflugstrasse 4", prog:[
+    {t:"Fernsehturm — réservation 10h30", cls:"strong"},
+    {t:"Alexanderplatz"},
+    {t:"Nikolaiviertel"},
+    {t:"Île aux musées (extérieur)"},
+    {t:"Hackescher Markt"}
+  ]},
+  { n:12, date:"Dim. 16 août", ville:"Berlin — alternatif", addr:"Pflugstrasse 4", prog:[
+    {t:"U8 de Rosenthaler Platz à Alexanderplatz, puis S-Bahn jusqu'à Warschauer Strasse"},
+    {t:"East Side Gallery"},
+    {t:"Oberbaumbrücke"},
+    {t:"RAW-Gelände"},
+    {t:"Kreuzberg, Friedrichshain"}
+  ]},
+  { n:13, date:"Lun. 17 août", ville:"Berlin → Amsterdam", addr:"Meininger Hotel Amsterdam Amstel", addr2:"6 Julianaplein, Oost-Watergraafsmeer, 1097 DN Amsterdam", prog:[
+    {t:"Matin : Sachsenhausen, camp de concentration — gratuit, sans réservation, audioguides sur place"},
+    {t:"Départ pour Amsterdam", cls:"strong"}
+  ]},
+  { n:14, date:"Mar. 18 août", ville:"Amsterdam", addr:"Meininger Hotel Amsterdam Amstel", prog:[
+    {t:"Métro vers le centre : ligne 51 ou 53/54, direction Amsterdam Centraal"},
+    {t:"Place du Dam (extérieur palais royal, Nieuwe Kerk, ruelles du centre)"},
+    {t:"Quartier Jordaan : canaux, boutiques, petits ponts, maisons typiques"},
+    {t:"Les Neuf Rues : friperies, boutiques originales, rues photogéniques"},
+    {t:"AM : croisière sur les canaux, balade dans le quartier rouge"}
+  ]},
+  { n:15, date:"Mer. 19 août", ville:"Bruxelles", addr:"51 quai au Bois à Brûler, 1000 Bruxelles", prog:[
+    {t:"Départ pour Bruxelles", cls:"strong"},
+    {t:"Place Sainte-Catherine"},
+    {t:"Dîner sur la Grand-Place"}
+  ]},
+  { n:16, date:"Jeu. 20 août", ville:"Bruxelles", addr:"51 quai au Bois à Brûler, 1000 Bruxelles", prog:[
+    {t:"Galeries Royales Saint-Hubert"},
+    {t:"Grand-Place"},
+    {t:"Manneken Pis"},
+    {t:"Tintin — rue de l'Étuve"},
+    {t:"Lucky Luke — rue de la Buanderie"},
+    {t:"Spirou — rue Notre-Dame"},
+    {t:"Gaston — rue de l'Écuyer"},
+    {t:"Boule et Bill — rue du Chevreuil"}
+  ]},
+  { n:17, date:"Ven. 21 août", ville:"Bruxelles → Chevaigné", addr:"Retour à la maison", addr2:"Chemin inverse jusqu'à Chevaigné", prog:[
+    {t:"Route du retour, Bruxelles → Chevaigné", cls:"strong"}
+  ]}
+];
+
+const badges = [
+  ["🥨","Explorateur de Strasbourg"],["⛪","Maître de la cathédrale"],["🎢","Survivant d’Europa-Park"],["🎠","Double dose de sensations"],
+  ["🚘","Pilote de Stuttgart"],["📜","Gardien de la mémoire"],["🏰","Chevalier de Nuremberg"],["🎨","Éclaireur de Leipzig"],
+  ["🦅","Historien de Berlin"],["🧱","Passe-muraille"],["📺","Au sommet de Berlin"],["🎸","Berlin alternatif"],
+  ["🚗","Grand voyageur"],["🚲","Capitaine des canaux"],["🧇","Chasseur de gaufres"],["🦸","Héros de la BD"],["🏁","Road Trip Europe terminé"]
+];
+const STORAGE_KEY = "roadtrip-done-days";
+function loadDone(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e){ return []; }
+}
+function saveDone(arr){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  pushFamilyProgress(arr);
+}
+let done = loadDone();
+
+// Determine "today" by real date within trip range
+function computeTodayIndex(){
+  const now = new Date();
+  const y = now.getFullYear();
+  // Trip is Aug 5-20 2026; only highlight if within range & correct year
+  const start = new Date(2026,7,5);
+  const end = new Date(2026,7,21);
+  if(now >= start && now <= end){
+    const diff = Math.floor((now - start) / 86400000);
+    return diff + 1;
+  }
+  return null;
+}
+const todayIndex = computeTodayIndex();
+
+const timeline = document.getElementById('timeline');
+
+days.forEach(d => {
+  const el = document.createElement('div');
+  el.className = 'day';
+  el.dataset.n = d.n;
+  if(done.includes(d.n)) el.classList.add('done');
+  if(todayIndex === d.n) el.classList.add('today','open');
+
+  const progItems = d.prog.map(p =>
+    `<li class="${p.cls || ''}">${p.t}</li>`
+  ).join('');
+
+  const addrHtml = d.addr ? `<div class="addr">${d.addr}${d.addr2 ? `<span>${d.addr2}</span>` : ''}</div>` : '';
+
+  el.innerHTML = `
+    <div class="day-dot"></div>
+    <div class="card">
+      <div class="card-head">
+        <div class="check">✓</div>
+        <div class="head-text">
+          <div class="head-top">
+            <span class="jour-num">Jour ${d.n}</span>
+            <span class="date-txt">${d.date}</span>
+          </div>
+          <div class="ville">${d.ville}</div>
+        </div>
+        <div class="chevron"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          ${addrHtml}
+          <ul class="prog">${progItems}</ul>
+          ${d.addr ? `<div class="action-row">
+            <a class="action-link apple" href="https://maps.apple.com/?q=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener"> Plans</a>
+            <a class="action-link google" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener">Google Maps</a>
+            <button class="action-btn car save-car-btn" data-day="${d.n}">🚗 Garée ici</button>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  el.querySelector('.check').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const n = d.n;
+    if(done.includes(n)){
+      done = done.filter(x => x !== n);
+      el.classList.remove('done');
+    } else {
+      done.push(n);
+      el.classList.add('done');
+      celebrateBadge(n);
+    }
+    saveDone(done);
+    updateProgress();
+    renderBadges();
+  });
+
+  el.querySelector('.card-head').addEventListener('click', () => {
+    el.classList.toggle('open');
+  });
+
+  timeline.appendChild(el);
+});
+
+document.querySelectorAll('.save-car-btn').forEach(btn => {
+  btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    saveCarPosition();
+  });
+});
+
+function updateProgress(){
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  const pct = Math.round((done.length / days.length) * 100);
+  fill.style.width = pct + '%';
+  label.textContent = `${done.length} / ${days.length}`;
+  const bc=document.getElementById('badgeCount'); if(bc) bc.textContent=done.length;
+}
+
+updateProgress();
+
+if(todayIndex){
+  setTimeout(() => {
+    const t = document.querySelector('.day.today');
+    if(t) t.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 300);
+}
+
+/* ---------- Badges et synchronisation familiale ---------- */
+function refreshDoneUI(){
+  document.querySelectorAll('.day').forEach(el=>el.classList.toggle('done',done.includes(Number(el.dataset.n))));
+  updateProgress(); renderBadges();
+}
+function renderBadges(){
+  const list=document.getElementById('badgesList'); if(!list) return;
+  list.innerHTML=badges.map((b,i)=>`<div class="badge-card ${done.includes(i+1)?'':'locked'}"><div class="badge-icon">${b[0]}</div><div><div class="badge-title">${b[1]}</div><div class="badge-sub">${done.includes(i+1)?'Débloqué — Jour '+(i+1):'À débloquer au Jour '+(i+1)}</div></div></div>`).join('');
+}
+function celebrateBadge(n){
+  const b=badges[n-1]; if(!b) return;
+  document.getElementById('celebrationIcon').textContent=b[0];
+  document.getElementById('celebrationTitle').textContent=b[1];
+  const box=document.getElementById('badgeCelebration'); box.classList.add('show');
+  setTimeout(()=>box.classList.remove('show'),1800);
+}
+document.getElementById('badgesBtn').addEventListener('click',()=>{renderBadges();document.getElementById('badgesModal').classList.add('open')});
+document.getElementById('badgesCloseBtn').addEventListener('click',()=>document.getElementById('badgesModal').classList.remove('open'));
+document.getElementById('badgesModal').addEventListener('click',e=>{if(e.target.id==='badgesModal')e.currentTarget.classList.remove('open')});
+
+let familyDoc=null, applyingRemote=false;
+function setSyncState(state,text){
+  const dot=document.getElementById('syncDot'); dot.className='sync-dot '+state;
+  document.getElementById('syncLabel').textContent=text;
+}
+async function initFamilySync(){
+  const cfg=window.ROADTRIP_FIREBASE_CONFIG;
+  if(!cfg || !cfg.apiKey){ setSyncState('offline','Mode local'); return; }
+  try{
+    firebase.initializeApp(cfg);
+    await firebase.auth().signInAnonymously();
+    familyDoc=firebase.firestore().collection('roadtrips').doc(window.ROADTRIP_FAMILY_CODE || 'dib-europe-2026');
+    familyDoc.onSnapshot(snap=>{
+      if(!snap.exists){ pushFamilyProgress(done); return; }
+      const remote=(snap.data().done||[]).map(Number);
+      applyingRemote=true; done=[...new Set(remote)].sort((a,b)=>a-b);
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(done)); refreshDoneUI(); applyingRemote=false;
+      setSyncState('online','Famille synchronisée');
+    },()=>setSyncState('offline','Sync indisponible'));
+  }catch(e){ console.warn('Synchronisation familiale:',e); setSyncState('offline','Mode local'); }
+}
+async function pushFamilyProgress(arr){
+  if(!familyDoc || applyingRemote) return;
+  try{ await familyDoc.set({done:arr,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}); }
+  catch(e){ setSyncState('offline','Sync en attente'); }
+}
+document.getElementById('syncBtn').addEventListener('click',()=>{
+  alert(familyDoc ? 'La progression est synchronisée entre les téléphones de la famille.' : 'La synchronisation sera activée après la configuration Firebase. Les données restent enregistrées sur cet iPhone.');
+});
+renderBadges(); initFamilySync();
+
+/* ---------- Tabs ---------- */
+const tabBtnList = document.getElementById('tabBtnList');
+const tabBtnMap = document.getElementById('tabBtnMap');
+const tabBtnResto = document.getElementById('tabBtnResto');
+const tabBtnCourse = document.getElementById('tabBtnCourse');
+const listView = document.getElementById('listView');
+const listFooter = document.getElementById('listFooter');
+const mapView = document.getElementById('mapView');
+const restoView = document.getElementById('restoView');
+const courseView = document.getElementById('courseView');
+
+function showTab(tab){
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse].forEach(b => b.classList.remove('active'));
+  listView.style.display = 'none';
+  listFooter.style.display = 'none';
+  mapView.classList.remove('active');
+  restoView.classList.remove('active');
+  courseView.classList.remove('active');
+
+  if(tab === 'map'){
+    tabBtnMap.classList.add('active');
+    mapView.classList.add('active');
+    initMap();
+    setTimeout(() => { if(window._leafletMap) window._leafletMap.invalidateSize(); }, 60);
+  } else if(tab === 'course'){
+    tabBtnCourse.classList.add('active');
+    courseView.classList.add('active');
+    initCourseMap();
+    setTimeout(() => { if(window._courseMap) window._courseMap.invalidateSize(); }, 60);
+  } else if(tab === 'resto'){
+    tabBtnResto.classList.add('active');
+    restoView.classList.add('active');
+    renderCurated();
+  } else {
+    tabBtnList.classList.add('active');
+    listView.style.display = 'block';
+    listFooter.style.display = 'block';
+  }
+}
+tabBtnList.addEventListener('click', () => showTab('list'));
+tabBtnMap.addEventListener('click', () => showTab('map'));
+tabBtnResto.addEventListener('click', () => showTab('resto'));
+tabBtnCourse.addEventListener('click', () => showTab('course'));
+
+/* ---------- Map ---------- */
+const stops = [
+  { name:"Chevaigné", days:"Départ", lat:48.1836, lng:-1.5589 },
+  { name:"Strasbourg", days:"Jours 1–2", lat:48.5734, lng:7.7521 },
+  { name:"Europa-Park (Rust)", days:"Jours 3–4", lat:48.2664, lng:7.7220 },
+  { name:"Stuttgart", days:"Jour 5", lat:48.7758, lng:9.1829 },
+  { name:"Nuremberg", days:"Jours 6–7", lat:49.4521, lng:11.0767 },
+  { name:"Leipzig", days:"Jour 8", lat:51.3397, lng:12.3731 },
+  { name:"Berlin", days:"Jours 9–12", lat:52.5200, lng:13.4050 },
+  { name:"Amsterdam", days:"Jours 13–14", lat:52.3676, lng:4.9041 },
+  { name:"Bruxelles", days:"Jours 15–16", lat:50.8503, lng:4.3517 },
+  { name:"Chevaigné", days:"Jour 17 — Retour", lat:48.1836, lng:-1.5589 }
+];
+
+let mapInitialized = false;
+let watchId = null;
+
+function initMap(){
+  if(mapInitialized) return;
+  mapInitialized = true;
+
+  const map = L.map('map', { zoomControl: true }).setView([50.5, 7], 5);
+  window._leafletMap = map;
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 19
+  }).addTo(map);
+
+  const latlngs = stops.map(s => [s.lat, s.lng]);
+  L.polyline(latlngs, { color: '#C9A05C', weight: 3, dashArray: '1,8', lineCap:'round' }).addTo(map);
+
+  stops.forEach((s, i) => {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="stop-pin"><span>${i === 0 ? '' : (i === stops.length-1 ? '' : i)}</span></div>`,
+      iconSize: [26,26],
+      iconAnchor: [13,26]
+    });
+    L.marker([s.lat, s.lng], { icon })
+      .addTo(map)
+      .bindPopup(`<div class="popup-title">${s.name}</div>${s.days}`);
+  });
+
+  map.fitBounds(latlngs, { padding: [30,30] });
+}
+
+document.getElementById('locateBtn').addEventListener('click', () => {
+  if(!navigator.geolocation){
+    alert("La géolocalisation n'est pas disponible sur cet appareil.");
+    return;
+  }
+  const map = window._leafletMap;
+  if(watchId){
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+    if(window._meMarker) map.removeLayer(window._meMarker);
+    if(window._meCircle) map.removeLayer(window._meCircle);
+    document.getElementById('locateBtn').textContent = '📍 Me localiser';
+    return;
+  }
+  document.getElementById('locateBtn').textContent = '📍 Localisation…';
+  watchId = navigator.geolocation.watchPosition((pos) => {
+    const { latitude, longitude, accuracy } = pos.coords;
+    document.getElementById('locateBtn').textContent = '📍 Suivi en cours';
+    if(window._meMarker){
+      window._meMarker.setLatLng([latitude, longitude]);
+      window._meCircle.setLatLng([latitude, longitude]).setRadius(accuracy);
+    } else {
+      window._meMarker = L.circleMarker([latitude, longitude], {
+        radius: 7, color:'#3F6C63', fillColor:'#3F6C63', fillOpacity:1, weight:2
+      }).addTo(map).bindPopup("Toi");
+      window._meCircle = L.circle([latitude, longitude], {
+        radius: accuracy, color:'#3F6C63', fillColor:'#3F6C63', fillOpacity:0.1, weight:1
+      }).addTo(map);
+      map.setView([latitude, longitude], 9);
+    }
+  }, (err) => {
+    alert("Impossible d'accéder à ta position : " + err.message);
+    document.getElementById('locateBtn').textContent = '📍 Me localiser';
+    watchId = null;
+  }, { enableHighAccuracy: true });
+});
+
+/* ---------- Restaurants : sélection du voyage (notes réelles) ---------- */
+const restaurants = [
+  { city:"Strasbourg", items:[
+    { name:"Blue Flamingo", rating:4.8, count:1586, addr:"Presqu'île André-Malraux, 67000 Strasbourg", lat:48.5741577, lng:7.7594714 },
+    { name:"Restaurant Les Chauvins", rating:4.8, count:1224, addr:"3 Rue du Faisan, 67000 Strasbourg", lat:48.5833917, lng:7.7532083 },
+    { name:"Restaurant Le Kuhn", rating:4.6, count:2718, addr:"15 Rue Kuhn, 67000 Strasbourg", lat:48.5848711, lng:7.7376403 }
+  ]},
+  { city:"Rust / Europa-Park", items:[
+    { name:"taste – Restaurant | Bar", rating:4.8, count:184, addr:"Peter-Thumb-Straße 2, 77977 Rust", lat:48.261263, lng:7.7256192 },
+    { name:"Eatrenalin", rating:4.7, count:1098, addr:"Roland-Mack-Ring 5, 77977 Rust", lat:48.2611058, lng:7.7377446 },
+    { name:"Takumi Asia Fusion", rating:4.5, count:84, addr:"Franz-Sales-Straße 27, 77977 Rust", lat:48.2600432, lng:7.729197 }
+  ]},
+  { city:"Stuttgart", items:[
+    { name:"Don Via Restaurant", rating:4.6, count:1045, addr:"Theodor-Heuss-Straße 14, 70174 Stuttgart", lat:48.7771087, lng:9.1733872 },
+    { name:"Alte Kanzlei", rating:4.5, count:3677, addr:"Schillerplatz 5, 70173 Stuttgart", lat:48.7774891, lng:9.1786788 },
+    { name:"Carls Brewery", rating:4.5, count:10631, addr:"Stauffenbergstraße 1, 70173 Stuttgart", lat:48.7794633, lng:9.1799805 }
+  ]},
+  { city:"Nuremberg", items:[
+    { name:"Tisane", rating:4.9, count:121, addr:"Augustinerhof 1, 90403 Nürnberg", lat:49.4536152, lng:11.0756538 },
+    { name:"Tucher-Bräu am Opernhaus", rating:4.7, count:5374, addr:"Am Kartäusertor 1, 90402 Nürnberg", lat:49.4472369, lng:11.075091 },
+    { name:"Trödelstuben", rating:4.5, count:5065, addr:"Trödelmarkt 30, 90403 Nürnberg", lat:49.453285, lng:11.0746114 }
+  ]},
+  { city:"Leipzig", items:[
+    { name:"Restaurant Goldberg", rating:4.9, count:404, addr:"Thomaskirchhof 17, 04109 Leipzig", lat:51.3387994, lng:12.3721038 },
+    { name:"Restaurant LUCE", rating:4.9, count:38, addr:"Tröndlinring 8, 04105 Leipzig", lat:51.344909, lng:12.3728917 },
+    { name:"Auerbachs Keller", rating:4.4, count:9920, addr:"Grimmaische Str. 2-4, 04109 Leipzig", lat:51.3396848, lng:12.3754921 }
+  ]},
+  { city:"Berlin", items:[
+    { name:"BLESS Restaurant", rating:4.8, count:2245, addr:"Hausvogteipl. 10, 10117 Berlin", lat:52.5124086, lng:13.3967904 },
+    { name:"Beast Berlin", rating:4.7, count:1837, addr:"Karl-Liebknecht-Str. 29, 10178 Berlin", lat:52.5247687, lng:13.4121757 },
+    { name:"PeterPaul", rating:4.7, count:1355, addr:"Torstraße 99, 10119 Berlin", lat:52.5299794, lng:13.4042659 }
+  ]},
+  { city:"Amsterdam", items:[
+    { name:"Lucky Duck Amsterdam", rating:4.9, count:1088, addr:"Voetboogstraat 13, 1012 XK Amsterdam", lat:52.3682283, lng:4.8908089 },
+    { name:"The Seafood Bar", rating:4.8, count:7874, addr:"Damrak 213, 1012 ZH Amsterdam", lat:52.3755708, lng:4.8965746 },
+    { name:"Namche Amsterdam", rating:4.8, count:710, addr:"Lange Leidsedwarsstraat 91, 1017 NH Amsterdam", lat:52.3631792, lng:4.8858868 }
+  ]},
+  { city:"Bruxelles", items:[
+    { name:"La bonne chère", rating:4.9, count:657, addr:"Rue Notre-Seigneur 19, 1000 Bruxelles", lat:50.840337, lng:4.3502952 },
+    { name:"GUS", rating:4.8, count:469, addr:"Rue des Cultes 36, 1000 Bruxelles", lat:50.8505525, lng:4.3680007 },
+    { name:"The Lobster House", rating:4.8, count:13813, addr:"Rue des Bouchers 34, 1000 Bruxelles", lat:50.8478926, lng:4.3546542 }
+  ]}
+];
+
+let curatedRendered = false;
+function renderCurated(){
+  if(curatedRendered) return;
+  curatedRendered = true;
+  const panel = document.getElementById('curatedPanel');
+  panel.innerHTML = restaurants.map(group => `
+    <div class="city-group">
+      <h3>${group.city}</h3>
+      ${group.items.map(r => {
+        const q = encodeURIComponent(r.name + ', ' + r.addr);
+        return `
+        <div class="resto-card">
+          <div class="resto-info">
+            <div class="resto-name">${r.name}</div>
+            <div class="resto-meta">
+              <span class="resto-rating">★ ${r.rating.toFixed(1)}</span>
+              <span>(${r.count.toLocaleString('fr-FR')} avis)</span>
+              <span>· ${r.addr}</span>
+            </div>
+          </div>
+          <button class="resto-link resto-pin-btn" title="Voir sur la carte" data-name="${r.name.replace(/"/g,'&quot;')}" data-addr="${r.addr.replace(/"/g,'&quot;')}" data-lat="${r.lat}" data-lng="${r.lng}">🗺️</button>
+          <a class="resto-link" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">↗</a>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+
+  panel.querySelectorAll('.resto-pin-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      showRestoOnMap(btn.dataset.name, btn.dataset.addr, parseFloat(btn.dataset.lat), parseFloat(btn.dataset.lng));
+    });
+  });
+}
+
+function showRestoOnMap(name, addr, lat, lng){
+  subtabNearby.classList.add('active');
+  subtabCurated.classList.remove('active');
+  nearbyPanel.classList.add('active');
+  curatedPanel.classList.remove('active');
+  initRestoMap();
+  setTimeout(() => {
+    const map = window._restoMap;
+    map.invalidateSize();
+    map.setView([lat, lng], 16);
+    if(window._pickMarker) map.removeLayer(window._pickMarker);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="resto-pin resto-pin-gold"><span>★</span></div>`,
+      iconSize: [26,26],
+      iconAnchor: [13,26]
+    });
+    window._pickMarker = L.marker([lat, lng], { icon })
+      .addTo(map)
+      .bindPopup(`<div class="popup-title">${name}</div>${addr}`)
+      .openPopup();
+  }, 80);
+}
+
+/* ---------- Restaurants : autour de moi (en direct, gratuit, OpenStreetMap) ---------- */
+const subtabCurated = document.getElementById('subtabCurated');
+const subtabNearby = document.getElementById('subtabNearby');
+const curatedPanel = document.getElementById('curatedPanel');
+const nearbyPanel = document.getElementById('nearbyPanel');
+
+subtabCurated.addEventListener('click', () => {
+  subtabCurated.classList.add('active');
+  subtabNearby.classList.remove('active');
+  curatedPanel.classList.add('active');
+  nearbyPanel.classList.remove('active');
+});
+subtabNearby.addEventListener('click', () => {
+  subtabNearby.classList.add('active');
+  subtabCurated.classList.remove('active');
+  nearbyPanel.classList.add('active');
+  curatedPanel.classList.remove('active');
+  initRestoMap();
+  setTimeout(() => { if(window._restoMap) window._restoMap.invalidateSize(); }, 60);
+});
+
+let restoMapInitialized = false;
+function initRestoMap(){
+  if(restoMapInitialized) return;
+  restoMapInitialized = true;
+  const map = L.map('restoMap').setView([48.85, 2.35], 5);
+  window._restoMap = map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 19
+  }).addTo(map);
+}
+
+document.getElementById('restoLocateBtn').addEventListener('click', () => {
+  if(!navigator.geolocation){
+    alert("La géolocalisation n'est pas disponible sur cet appareil.");
+    return;
+  }
+  const btn = document.getElementById('restoLocateBtn');
+  btn.disabled = true;
+  btn.textContent = '📍 Localisation…';
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude } = pos.coords;
+    const map = window._restoMap;
+    map.setView([latitude, longitude], 15);
+
+    if(window._meRestoMarker) map.removeLayer(window._meRestoMarker);
+    window._meRestoMarker = L.circleMarker([latitude, longitude], {
+      radius: 7, color:'#3F6C63', fillColor:'#3F6C63', fillOpacity:1, weight:2
+    }).addTo(map).bindPopup("Toi");
+
+    if(window._restoMarkers){ window._restoMarkers.forEach(m => map.removeLayer(m)); }
+    window._restoMarkers = [];
+
+    btn.textContent = '📍 Recherche…';
+    await searchNearbyRestaurants(latitude, longitude, map, btn);
+  }, (err) => {
+    btn.disabled = false;
+    let msg;
+    if(err.code === err.PERMISSION_DENIED){
+      msg = "Localisation refusée. Va dans Réglages > Safari > Position pour l'autoriser, puis réessaie.";
+    } else if(err.code === err.POSITION_UNAVAILABLE){
+      msg = "Position indisponible pour le moment (signal GPS faible). Réessaie dans quelques secondes.";
+    } else if(err.code === err.TIMEOUT){
+      msg = "La localisation a mis trop de temps. Réessaie.";
+    } else {
+      msg = "Impossible d'accéder à ta position : " + err.message;
+    }
+    btn.textContent = '📍 Chercher ici';
+    alert(msg);
+  }, { enableHighAccuracy: true, timeout: 12000 });
+});
+
+/* Tries several Overpass mirrors in turn so a single down/slow server never blocks the search. */
+const OVERPASS_MIRRORS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.ru/api/interpreter'
+];
+
+function fetchWithTimeout(url, opts, ms){
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(id));
+}
+
+async function searchNearbyRestaurants(lat, lng, map, btn){
+  const query = `[out:json][timeout:12];node(around:1200,${lat},${lng})[amenity=restaurant];out body 40;`;
+  let data = null;
+  let lastError = null;
+
+  for(const mirror of OVERPASS_MIRRORS){
+    try{
+      btn.textContent = '📍 Recherche…';
+      const res = await fetchWithTimeout(mirror + '?data=' + encodeURIComponent(query), {}, 6000);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      data = await res.json();
+      break; // success, stop trying other mirrors
+    } catch(e){
+      lastError = e;
+      // try next mirror
+    }
+  }
+
+  btn.disabled = false;
+
+  if(!data){
+    btn.textContent = '📍 Chercher ici';
+    const openMaps = confirm(
+      "La recherche de restaurants à proximité n'a pas pu aboutir (connexion instable ou service momentanément indisponible).\n\nOuvrir Google Maps à la place pour voir les restaurants autour de toi ?"
+    );
+    if(openMaps){
+      window.open(`https://www.google.com/maps/search/restaurants/@${lat},${lng},16z`, '_blank');
+    }
+    return;
+  }
+
+  const elements = data.elements || [];
+  elements.forEach(el => {
+    const name = (el.tags && el.tags.name) || 'Restaurant';
+    const cuisine = (el.tags && el.tags.cuisine) ? el.tags.cuisine.replace(/_/g,' ') : '';
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="resto-pin"><span>🍽</span></div>`,
+      iconSize: [24,24],
+      iconAnchor: [12,24]
+    });
+    const q = encodeURIComponent(name + (cuisine ? ' ' + cuisine : ''));
+    const marker = L.marker([el.lat, el.lon], { icon })
+      .addTo(map)
+      .bindPopup(`<div class="popup-title">${name}</div>${cuisine ? cuisine + '<br>' : ''}<a href="https://www.google.com/maps/search/?api=1&query=${q}&center=${el.lat},${el.lon}" target="_blank" rel="noopener">Voir sur Google Maps ↗</a>`);
+    window._restoMarkers.push(marker);
+  });
+
+  if(elements.length === 0){
+    btn.textContent = '📍 Aucun résultat, chercher ici';
+  } else {
+    btn.textContent = `📍 ${elements.length} restaurants trouvés`;
+  }
+}
+
+
+/* ---------- Courses autour de moi ---------- */
+let courseMapInitialized = false;
+let courseFilter = 'all';
+function initCourseMap(){
+  if(courseMapInitialized) return;
+  courseMapInitialized = true;
+  const map = L.map('courseMap').setView([50.2, 7.2], 5);
+  window._courseMap = map;
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap', maxZoom:19
+  }).addTo(map);
+}
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    courseFilter = chip.dataset.shop;
+    if(window._lastCoursePosition) searchNearbyShops(window._lastCoursePosition.lat, window._lastCoursePosition.lng);
+  });
+});
+
+document.getElementById('courseLocateBtn').addEventListener('click', () => {
+  if(!navigator.geolocation){ alert("La géolocalisation n'est pas disponible."); return; }
+  const btn = document.getElementById('courseLocateBtn');
+  btn.disabled = true; btn.textContent = '📍 Localisation…';
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+    window._lastCoursePosition={lat,lng};
+    initCourseMap();
+    const map=window._courseMap; map.setView([lat,lng],15);
+    if(window._courseMe) map.removeLayer(window._courseMe);
+    window._courseMe=L.circleMarker([lat,lng],{radius:7,color:'#3F6C63',fillColor:'#3F6C63',fillOpacity:1,weight:2}).addTo(map).bindPopup('Vous êtes ici');
+    await searchNearbyShops(lat,lng);
+    btn.disabled=false;
+  }, err => {
+    btn.disabled=false; btn.textContent='🛒 Trouver des courses';
+    alert(err.code===1 ? "Localisation refusée. Autorise la position pour Safari dans Réglages." : "Position indisponible : "+err.message);
+  }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
+});
+
+async function searchNearbyShops(lat,lng){
+  const map=window._courseMap, btn=document.getElementById('courseLocateBtn'), status=document.getElementById('courseStatus');
+  if(window._courseMarkers) window._courseMarkers.forEach(m=>map.removeLayer(m));
+  window._courseMarkers=[];
+  btn.textContent='🛒 Recherche…'; status.textContent='Recherche des commerces dans un rayon de 1,5 km…';
+  let selector;
+  if(courseFilter==='all') selector='[shop~"supermarket|convenience|bakery|butcher|greengrocer"]';
+  else selector=`[shop=${courseFilter}]`;
+  const query=`[out:json][timeout:15];(node(around:1500,${lat},${lng})${selector};way(around:1500,${lat},${lng})${selector};);out center 60;`;
+  let data=null;
+  for(const mirror of OVERPASS_MIRRORS){
+    try{
+      const res=await fetchWithTimeout(mirror+'?data='+encodeURIComponent(query),{},7000);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      data=await res.json(); break;
+    }catch(e){}
+  }
+  if(!data){
+    status.textContent='Service cartographique indisponible. Google Maps peut prendre le relais.';
+    btn.textContent='🛒 Ouvrir Google Maps';
+    btn.onclick=()=>window.open(`https://www.google.com/maps/search/supermarket/@${lat},${lng},15z`,'_blank');
+    return;
+  }
+  const labels={supermarket:'Supermarché',convenience:'Épicerie',bakery:'Boulangerie',butcher:'Boucherie',greengrocer:'Fruits & légumes'};
+  for(const el of (data.elements||[])){
+    const plat=el.lat ?? (el.center&&el.center.lat), plng=el.lon ?? (el.center&&el.center.lon);
+    if(plat==null||plng==null) continue;
+    const tags=el.tags||{}, name=tags.name||labels[tags.shop]||'Commerce', kind=labels[tags.shop]||tags.shop||'Commerce';
+    const icon=L.divIcon({className:'',html:'<div class="shop-pin"><span>🛒</span></div>',iconSize:[25,25],iconAnchor:[12,25]});
+    const apple=`https://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${plat},${plng}`;
+    const google=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&center=${plat},${plng}`;
+    const marker=L.marker([plat,plng],{icon}).addTo(map).bindPopup(`<div class="popup-title">${escapeHtml(name)}</div>${escapeHtml(kind)}<br><a href="${apple}" target="_blank" rel="noopener">Plans</a> · <a href="${google}" target="_blank" rel="noopener">Google Maps</a>`);
+    window._courseMarkers.push(marker);
+  }
+  const count=window._courseMarkers.length;
+  status.textContent=count ? `${count} commerce${count>1?'s':''} trouvé${count>1?'s':''} autour de vous.` : 'Aucun commerce renseigné dans ce rayon. Essaie Google Maps.';
+  btn.textContent=count ? `🛒 ${count} trouvé${count>1?'s':''}` : '🛒 Chercher à nouveau';
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
+/* ---------- Voiture ---------- */
+function saveCarPosition(){
+  if(!navigator.geolocation){ alert('Géolocalisation indisponible.'); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const car={lat:pos.coords.latitude,lng:pos.coords.longitude,at:new Date().toISOString()};
+    localStorage.setItem('roadtrip-car-position',JSON.stringify(car));
+    showToast('🚗 Position de la voiture enregistrée');
+  },()=>alert("Impossible d'enregistrer la position de la voiture."),{enableHighAccuracy:true,timeout:10000});
+}
+
+/* ---------- SOS ---------- */
+const sosModal=document.getElementById('sosModal');
+document.getElementById('sosBtn').addEventListener('click',()=>sosModal.classList.add('open'));
+document.getElementById('sosCloseBtn').addEventListener('click',()=>sosModal.classList.remove('open'));
+sosModal.addEventListener('click',e=>{if(e.target===sosModal)sosModal.classList.remove('open')});
+function withCurrentPosition(cb){
+  if(!navigator.geolocation){ alert('Géolocalisation indisponible.'); return; }
+  navigator.geolocation.getCurrentPosition(p=>cb(p.coords.latitude,p.coords.longitude),()=>alert('Impossible de récupérer la position.'),{enableHighAccuracy:true,timeout:10000});
+}
+document.getElementById('copyPositionBtn').addEventListener('click',()=>withCurrentPosition(async(lat,lng)=>{
+  const text=`Ma position : https://maps.apple.com/?ll=${lat},${lng}`;
+  try{await navigator.clipboard.writeText(text);showToast('📍 Position copiée');}
+  catch(e){prompt('Copie cette position :',text);}
+}));
+document.getElementById('hospitalBtn').addEventListener('click',()=>withCurrentPosition((lat,lng)=>window.open(`https://maps.apple.com/?q=hôpital&ll=${lat},${lng}`,'_blank')));
+document.getElementById('pharmacyBtn').addEventListener('click',()=>withCurrentPosition((lat,lng)=>window.open(`https://maps.apple.com/?q=pharmacie&ll=${lat},${lng}`,'_blank')));
+function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+
+/* ---------- Météo locale (Open-Meteo, sans clé API) ---------- */
+const WEATHER_CODES={
+  0:['☀️','Ciel dégagé'],1:['🌤️','Plutôt dégagé'],2:['⛅','Partiellement nuageux'],3:['☁️','Couvert'],
+  45:['🌫️','Brouillard'],48:['🌫️','Brouillard givrant'],51:['🌦️','Bruine faible'],53:['🌦️','Bruine'],55:['🌧️','Bruine forte'],
+  61:['🌧️','Pluie faible'],63:['🌧️','Pluie'],65:['🌧️','Pluie forte'],71:['🌨️','Neige faible'],73:['🌨️','Neige'],75:['❄️','Neige forte'],
+  80:['🌦️','Averses faibles'],81:['🌧️','Averses'],82:['⛈️','Fortes averses'],95:['⛈️','Orage'],96:['⛈️','Orage et grêle'],99:['⛈️','Fort orage et grêle']
+};
+async function loadLocalWeather(){
+  const card=document.getElementById('weatherCard');
+  const title=document.getElementById('weatherTitle'),detail=document.getElementById('weatherDetail'),temp=document.getElementById('weatherTemp'),icon=document.getElementById('weatherIcon');
+  if(!navigator.geolocation){detail.textContent='Géolocalisation indisponible';return;}
+  card.disabled=true; detail.textContent='Localisation et météo…';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude:lat,longitude:lng}=pos.coords;
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`;
+      const res=await fetchWithTimeout(url,{},8000); if(!res.ok) throw new Error('HTTP '+res.status);
+      const data=await res.json(), c=data.current||{}, d=data.daily||{};
+      const w=WEATHER_CODES[c.weather_code]||['🌤️','Météo variable'];
+      icon.textContent=w[0]; title.textContent=w[1]; temp.textContent=Math.round(c.temperature_2m)+'°';
+      const min=d.temperature_2m_min?.[0],max=d.temperature_2m_max?.[0],rain=d.precipitation_probability_max?.[0];
+      detail.textContent=`Min ${Math.round(min)}° · Max ${Math.round(max)}° · Pluie ${rain??0}% · Vent ${Math.round(c.wind_speed_10m||0)} km/h`;
+      localStorage.setItem('roadtrip-last-weather',JSON.stringify({at:Date.now(),icon:w[0],title:w[1],temp:Math.round(c.temperature_2m),detail:detail.textContent}));
+    }catch(e){ detail.textContent='Météo indisponible — touchez pour réessayer'; }
+    finally{card.disabled=false;}
+  },err=>{detail.textContent=err.code===1?'Autorisez la position dans Safari':'Position indisponible';card.disabled=false;},{enableHighAccuracy:false,timeout:10000,maximumAge:300000});
+}
+document.getElementById('weatherCard').addEventListener('click',loadLocalWeather);
+try{const w=JSON.parse(localStorage.getItem('roadtrip-last-weather'));if(w&&Date.now()-w.at<3600000){document.getElementById('weatherIcon').textContent=w.icon;document.getElementById('weatherTitle').textContent=w.title;document.getElementById('weatherTemp').textContent=w.temp+'°';document.getElementById('weatherDetail').textContent=w.detail;}}catch(e){}
+
+/* ---------- PWA ---------- */
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{})); }
+
+</script>
+</body>
+</html>
