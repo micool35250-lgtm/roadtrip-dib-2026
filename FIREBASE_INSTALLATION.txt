@@ -1,0 +1,37 @@
+SYNCHRONISATION FAMILIALE — CONFIGURATION FIREBASE
+
+Cette étape est facultative pour publier l'application. Sans Firebase, chaque iPhone conserve sa progression localement.
+Avec Firebase, les jours cochés et les badges sont partagés entre les téléphones.
+
+1. Aller sur https://console.firebase.google.com/ et créer un projet nommé roadtrip-dib-2026.
+2. Dans Authentication > Sign-in method, activer Anonymous (Anonyme).
+3. Dans Firestore Database, créer une base en mode Production, région europe-west.
+4. Dans Project settings > Your apps, ajouter une application Web (icône </>), nom : RoadTrip Dib.
+5. Copier l'objet firebaseConfig fourni.
+6. Ouvrir firebase-config.js et remplacer null par cet objet, par exemple :
+
+window.ROADTRIP_FIREBASE_CONFIG = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};
+window.ROADTRIP_FAMILY_CODE = "dib-europe-2026";
+
+7. Dans Firestore > Rules, remplacer les règles par :
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /roadtrips/{tripId} {
+      allow read, write: if request.auth != null && tripId == 'dib-europe-2026';
+    }
+  }
+}
+
+8. Publier les règles puis remettre firebase-config.js sur GitHub.
+
+NOTE DE SÉCURITÉ
+La configuration Firebase visible dans le code n'est pas un mot de passe. La protection repose sur l'authentification anonyme et les règles Firestore. Le code famille fixe évite qu'un visiteur ordinaire modifie les données, mais ce n'est pas une protection équivalente à un compte avec mot de passe. Pour ce voyage familial, c'est un compromis simple.
