@@ -1,35 +1,22 @@
-ROADTRIP DIB 2026 — RAPPORT DE CONTRÔLE
-Date : 2 août 2026
+ROADTRIP DIB 2026 — CONTRÔLES EFFECTUÉS
 
-VALIDÉ PAR CONTRÔLE STATIQUE
-- Structure HTML présente et complète
-- Une seule balise de script applicatif interne
-- Syntaxe JavaScript validée avec Node.js --check
-- manifest.webmanifest : JSON valide
-- service-worker.js présent
-- Icônes 192 px et 512 px présentes
-- index.html à la racine
-- 4 onglets présents : Itinéraire, Carte, Restos, Courses
-- 17 journées présentes
-- Liens Apple Plans et Google Maps présents
-- Fonctions SOS, copie de position, hôpital, pharmacie présentes
-- Enregistrement de la position de la voiture présent
-- Recherche de restaurants et de commerces via plusieurs serveurs Overpass
-- Solution de repli Google Maps en cas d'indisponibilité d'Overpass
+Version : hébergements intégrés
 
-CORRECTION EFFECTUÉE
-- Suppression d'un bloc JavaScript parasite placé à l'intérieur de la balise externe Leaflet.
+Contrôles automatiques réussis :
+- archive et structure des fichiers ;
+- syntaxe JavaScript avec Node.js ;
+- présence des 17 journées ;
+- présence des 8 hébergements et de leurs adresses ;
+- présence des 4 onglets : Itinéraire, Carte, Restos, Courses ;
+- présence de la météo locale ;
+- présence des 17 badges ;
+- présence du SOS ;
+- présence des liens Apple Plans et Google Maps ;
+- manifeste PWA et service worker présents.
 
-LIMITES DU TEST
-- Le navigateur Chromium de l'environnement de contrôle n'a pas terminé le test visuel automatisé dans le délai imparti.
-- Le GPS réel, les permissions Safari iOS et l'installation PWA doivent être validés après publication HTTPS sur GitHub Pages.
-- Les résultats restaurants/commerces dépendent de la connexion et des données publiques OpenStreetMap.
-
-TEST FINAL À FAIRE SUR IPHONE
-1. Ouvrir le site GitHub Pages dans Safari.
-2. Autoriser la position.
-3. Tester Carte > Me localiser.
-4. Tester Restos > Autour de moi.
-5. Tester Courses > Trouver des courses.
-6. Tester SOS sans appeler le 112.
-7. Installer via Partager > Sur l'écran d'accueil.
+À valider sur iPhone après publication HTTPS :
+- autorisation GPS Safari ;
+- météo de la position ;
+- recherche Restaurants/Courses via OpenStreetMap ;
+- installation sur l’écran d’accueil ;
+- synchronisation Firebase après configuration.

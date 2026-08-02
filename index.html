@@ -586,12 +586,24 @@
   .weather-card{margin-top:10px;border:1px solid rgba(201,160,92,.35);background:rgba(239,231,213,.08);border-radius:12px;padding:10px 12px;color:var(--paper);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;width:100%}
   .weather-icon{font-size:28px;line-height:1}.weather-main{flex:1;min-width:0}.weather-title{font-weight:700;font-size:12px}.weather-detail{font-size:11px;color:rgba(239,231,213,.72);margin-top:2px}.weather-temp{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--brass-soft)}
 
+
+  .stay-card{margin:0 0 12px;padding:12px;border:1px solid rgba(63,108,99,.28);border-radius:12px;background:rgba(63,108,99,.07)}
+  .stay-title{font-family:'Fraunces',serif;font-weight:700;color:var(--navy);font-size:15px;margin-bottom:3px}
+  .stay-label{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--teal);font-weight:700;margin-bottom:5px}
+  .stay-address{font-size:12.5px;font-weight:600;line-height:1.4;color:var(--ink);margin-bottom:8px}
+  .stay-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:9px}
+  .stay-meta span{font-size:11.5px;line-height:1.35;color:var(--ink-soft);background:var(--paper-card);border:1px solid var(--line);border-radius:8px;padding:7px}
+  .stay-actions{display:flex;gap:7px;flex-wrap:wrap}
+  .stay-actions a{font-size:11.5px;font-weight:700;text-decoration:none;border-radius:999px;padding:8px 10px;background:var(--navy);color:var(--paper)}
+  .stay-actions a.secondary{background:var(--teal)}
+  @media(max-width:430px){.stay-meta{grid-template-columns:1fr}.stay-actions a{flex:1;text-align:center}}
+
 </style>
 </head>
 <body>
 
 <header>
-  <p class="eyebrow">5 — 20 août 2026</p>
+  <p class="eyebrow">5 — 21 août 2026</p>
   <h1>RoadTrip Dib <span style="font-size:.72em;color:var(--brass-soft)">Europe 2026</span></h1>
   <p class="route-line">Strasbourg → Europa-Park → Stuttgart → Nuremberg → Leipzig → Berlin → Amsterdam → Bruxelles</p>
   <div class="progress-wrap">
@@ -783,7 +795,44 @@ const days = [
   { n:17, date:"Ven. 21 août", ville:"Bruxelles → Chevaigné", addr:"Retour à la maison", addr2:"Chemin inverse jusqu'à Chevaigné", prog:[
     {t:"Route du retour, Bruxelles → Chevaigné", cls:"strong"}
   ]}
+
 ];
+
+const stays = {
+  strasbourg:{name:"Logement Strasbourg",address:"13 Rue Jean-Paul de Dadelsen, 67200 Strasbourg, France",checkin:"5 août · après 15 h",checkout:"7 août · avant 11 h",access:"Serrure connectée",parking:"Stationnement à vérifier sur place",host:"Hôte : Arc"},
+  rust:{name:"Pension Mimosa",address:"Hindenburgstraße 3, 77977 Rust, Allemagne",checkin:"7 août · 17 h–22 h",checkout:"8 août · 8 h–10 h 30",access:"Accueil de la pension",parking:"Parking inclus",host:"Téléphone : +49 176 72149188"},
+  stuttgart:{name:"Hotel Allee 25",address:"Marbacher Straße 32, 70435 Stuttgart, Allemagne",checkin:"8 août · après 14 h",checkout:"9 août · avant 12 h",access:"Boîte à clés sécurisée",parking:"Parking gratuit indiqué dans l’annonce",host:"Hôte : Hotel Allee 25"},
+  nuremberg:{name:"Logement de Sven",address:"Tafelfeldstraße 21, 90443 Nürnberg, Allemagne",checkin:"9 août · après 14 h",checkout:"11 août · avant 11 h",access:"Boîte à clés sécurisée",parking:"Places devant la maison et le long de la rue",host:"Hôte : Sven"},
+  leipzig:{name:"Appartement d’Olga",address:"Seelenbinderstraße 4, 04159 Leipzig, Allemagne",checkin:"11 août · après 15 h",checkout:"12 août · avant 10 h",access:"Boîte à clés sécurisée",parking:"Place de stationnement incluse",host:"Hôte : Olga"},
+  berlin:{name:"East Side Apartment",address:"Pflugstraße 4, 10115 Berlin, Allemagne",checkin:"12 août · après 15 h",checkout:"17 août · avant 11 h",access:"Serrure connectée",parking:"Utiliser “J’ai garé la voiture ici”",host:"Hôte : Stefan"},
+  amsterdam:{name:"MEININGER Hotel Amsterdam Amstel",address:"Julianaplein 6, 1097 DN Amsterdam, Pays-Bas",checkin:"17 août · après 15 h",checkout:"19 août · avant 11 h",access:"Réception de l’hôtel",parking:"Vérifier les conditions de l’hôtel",host:"Téléphone : +31 20 808 3102"},
+  brussels:{name:"Citadines Sainte-Catherine Brussels",address:"51 Quai au Bois à Brûler, 1000 Bruxelles, Belgique",checkin:"19 août · après 15 h",checkout:"21 août · avant 11 h",access:"Réception de l’établissement",parking:"Vérifier les conditions de l’établissement",host:"Téléphone : +32 2 221 14 11"}
+};
+
+const stayForDay={1:'strasbourg',2:'strasbourg',3:'rust',4:'stuttgart',5:'nuremberg',6:'nuremberg',7:'leipzig',8:'berlin',9:'berlin',10:'berlin',11:'berlin',12:'berlin',13:'amsterdam',14:'amsterdam',15:'brussels',16:'brussels'};
+
+function stayHtml(dayNumber){
+  const key=stayForDay[dayNumber];
+  if(!key) return '';
+  const h=stays[key];
+  const q=encodeURIComponent(h.address);
+  return `<div class="stay-card">
+    <div class="stay-label">Hébergement ${[4,5,7,8,13,15].includes(dayNumber)?'du soir':'du séjour'}</div>
+    <div class="stay-title">🏠 ${h.name}</div>
+    <div class="stay-address">${h.address}</div>
+    <div class="stay-meta">
+      <span>🟢 Arrivée<br><strong>${h.checkin}</strong></span>
+      <span>🔴 Départ<br><strong>${h.checkout}</strong></span>
+      <span>🔑 Accès<br><strong>${h.access}</strong></span>
+      <span>🚗 Parking<br><strong>${h.parking}</strong></span>
+      <span>👤 Contact<br><strong>${h.host}</strong></span>
+    </div>
+    <div class="stay-actions">
+      <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener"> Retour au logement</a>
+      <a class="secondary" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target="_blank" rel="noopener">Google Maps</a>
+    </div>
+  </div>`;
+}
 
 const badges = [
   ["🥨","Explorateur de Strasbourg"],["⛪","Maître de la cathédrale"],["🎢","Survivant d’Europa-Park"],["🎠","Double dose de sensations"],
@@ -848,6 +897,7 @@ days.forEach(d => {
       </div>
       <div class="card-body">
         <div class="card-body-inner">
+          ${stayHtml(d.n)}
           ${addrHtml}
           <ul class="prog">${progItems}</ul>
           ${d.addr ? `<div class="action-row">
