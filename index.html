@@ -663,6 +663,10 @@
   .stay-card-compact .stay-address{font-size:12px;margin:0;}
   .stay-mini-link{flex:0 0 auto;text-decoration:none;background:var(--navy);color:var(--paper);padding:8px 10px;border-radius:10px;font-size:11.5px;font-weight:700;}
 
+  .stay-return-only{margin:10px 0 2px;display:flex;}
+  .stay-return-only a{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:linear-gradient(135deg,var(--navy),#243A63);color:var(--paper);padding:11px 14px;border-radius:13px;font-size:12.5px;font-weight:800;box-shadow:0 4px 12px rgba(18,33,61,.16);}
+  .stay-return-only a:active{transform:scale(.985);}
+
 </style>
 </head>
 <body>
@@ -923,6 +927,28 @@ function stayHtml(dayNumber){
   return (stayEvents[dayNumber] || []).map(stayEventHtml).join('');
 }
 
+
+const stayReturnByDay = {
+  2:'strasbourg',
+  6:'nuremberg',
+  9:'berlin',
+  10:'berlin',
+  11:'berlin',
+  12:'berlin',
+  14:'amsterdam',
+  16:'brussels'
+};
+
+function stayReturnHtml(dayNumber){
+  const key=stayReturnByDay[dayNumber];
+  const h=stays[key];
+  if(!h) return '';
+  const q=encodeURIComponent(h.address);
+  return `<div class="stay-return-only">
+    <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">🏠 Retour au logement</a>
+  </div>`;
+}
+
 const badges = [
   ["🥨","Explorateur de Strasbourg"],["⛪","Maître de la cathédrale"],["🎢","Survivant d’Europa-Park"],["🎠","Double dose de sensations"],
   ["🚘","Pilote de Stuttgart"],["📜","Gardien de la mémoire"],["🏰","Chevalier de Nuremberg"],["🎨","Éclaireur de Leipzig"],
@@ -989,6 +1015,7 @@ days.forEach(d => {
           ${stayHtml(d.n)}
           ${addrHtml}
           <ul class="prog">${progItems}</ul>
+          ${stayReturnHtml(d.n)}
           ${d.addr ? `<div class="action-row">
             <a class="action-link apple" href="https://maps.apple.com/?q=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener"> Plans</a>
             <a class="action-link google" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener">Google Maps</a>
