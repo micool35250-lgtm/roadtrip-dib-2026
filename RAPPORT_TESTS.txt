@@ -1,8 +1,14 @@
-RoadTrip Dib V1.11 — contrôles
-- Syntaxe JavaScript validée avec Node.js.
-- Manifeste JSON validé.
-- Service worker présent et cache incrémenté.
-- Boutons Hôpital et Pharmacie reliés à une recherche GPS en temps réel.
-- Liens Apple Plans utilisent q + sll (recherche autour de la position).
-- Liens Google Maps utilisent query + center comme solution parallèle.
-- Archive ZIP vérifiée.
+V1.14 — contrôles effectués
+- Structure HTML : présente
+- Filtres carte : Tout / Logements / Visites / Restos
+- 8 hébergements cartographiés
+- Restaurants sélectionnés cartographiés
+- Principales visites du programme cartographiées
+- Liens Apple Plans / Google Maps / Waze générés
+- Cache PWA mis à jour
+- Syntaxe JavaScript contrôlée séparément
+
+V1.15 : ajout de Rüyam Gemüse Kebab et Mustafa’s Gemüse Kebap à Berlin ; ajout automatique sur la carte via le filtre Restos.
+
+
+V1.16 : ajout éclipse, badge manuel synchronisé, marqueur carte, cache PWA v16.

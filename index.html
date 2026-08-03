@@ -396,6 +396,26 @@
   }
   .leaflet-popup-tip{ background: var(--paper-card); }
 
+
+  .map-filters{
+    position:absolute; top:12px; left:10px; right:10px; z-index:600;
+    display:flex; gap:7px; overflow-x:auto; padding:2px 2px 6px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .map-filters::-webkit-scrollbar{display:none;}
+  .map-filter{
+    flex:0 0 auto; border:1px solid rgba(18,33,61,.16); background:rgba(247,242,229,.96);
+    color:var(--navy); border-radius:999px; padding:8px 11px; font:600 11.5px 'Work Sans',sans-serif;
+    box-shadow:0 2px 8px rgba(18,33,61,.14); cursor:pointer;
+  }
+  .map-filter.active{background:var(--navy); color:var(--paper); border-color:var(--navy);}
+  .poi-pin{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    border:2px solid white;box-shadow:0 2px 7px rgba(18,33,61,.35);font-size:14px;}
+  .poi-pin.stay{background:#4f7cff}.poi-pin.visit{background:#8a5bd7}.poi-pin.resto{background:#ef8d35}
+  .map-popup-meta{font-size:11.5px;color:var(--ink-soft);margin:3px 0 8px;line-height:1.35}
+  .map-popup-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .map-popup-actions a{padding:6px 8px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:700;background:var(--navy);color:white}
+
   /* Restaurants tab */
   .resto-view{ display:none; }
   .resto-view.active{ display:block; }
@@ -544,28 +564,33 @@
   .action-link.apple{background:var(--navy);color:var(--paper)}
   .action-link.google{background:var(--teal);color:white}
   .action-btn.car{background:var(--brass);color:var(--navy-deep)}
-  .course-view{display:none;background:var(--paper);min-height:calc(100vh - 172px)}
+  .course-view{display:none;background:var(--paper);min-height:calc(100vh - 172px);padding:18px 16px 110px}
   .course-view.active{display:block}
-  .course-toolbar{max-width:640px;margin:0 auto;padding:14px 16px 8px;display:flex;gap:8px;overflow-x:auto}
-  .course-locate-wrap{max-width:640px;margin:0 auto;padding:6px 16px 12px;text-align:center}
-  .course-locate-btn{width:100%;border:0;border-radius:14px;padding:13px 16px;background:#111827;color:#fff;font:800 13px 'Work Sans',sans-serif;box-shadow:0 8px 20px rgba(17,24,39,.22);cursor:pointer}
+  .course-shell{max-width:640px;margin:0 auto}
+  .course-hero{background:linear-gradient(145deg,#172554,#111827);color:#fff;border-radius:22px;padding:20px;box-shadow:0 14px 32px rgba(17,24,39,.2);margin-bottom:14px}
+  .course-hero h2{font-family:'Fraunces',serif;font-size:22px;margin:0 0 6px}
+  .course-hero p{font-size:12px;line-height:1.5;margin:0;color:rgba(255,255,255,.76)}
+  .course-section-title{font:800 12px 'Work Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin:18px 2px 10px}
+  .course-toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .filter-chip{border:1px solid var(--line);background:var(--paper-card);color:var(--ink);border-radius:16px;padding:14px 10px;font:700 12px 'Work Sans';min-height:58px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 14px rgba(18,33,61,.06);cursor:pointer}
+  .filter-chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy);box-shadow:0 8px 20px rgba(18,33,61,.18)}
+  .course-locate-wrap{padding:14px 0 8px;text-align:center}
+  .course-locate-btn{width:100%;border:0;border-radius:16px;padding:14px 16px;background:var(--brass);color:var(--navy-deep);font:800 13px 'Work Sans',sans-serif;box-shadow:0 8px 20px rgba(201,160,92,.25);cursor:pointer}
   .course-locate-btn:disabled{opacity:.65;cursor:wait}
-  .course-permission-hint{margin-top:6px;color:var(--ink-soft);font-size:10.5px}
-  .course-live-actions{display:none;max-width:640px;margin:0 auto;padding:0 16px 12px;grid-template-columns:1fr 1fr;gap:10px}
+  .course-permission-hint{margin-top:7px;color:var(--ink-soft);font-size:10.5px}
+  .course-status{background:var(--paper-card);border:1px solid var(--line);color:var(--ink-soft);padding:11px 13px;border-radius:13px;font-size:12px;text-align:center;margin:6px 0 12px}
+  .course-live-actions{display:none;grid-template-columns:1fr 1fr;gap:10px}
   .course-live-actions.visible{display:grid}
-  .course-live-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border-radius:14px;text-decoration:none;font-weight:800;font-size:12.5px;box-shadow:0 7px 18px rgba(18,33,61,.12)}
+  .course-live-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:52px;border-radius:16px;text-decoration:none;font-weight:800;font-size:12.5px;box-shadow:0 7px 18px rgba(18,33,61,.12)}
   .course-live-link.google{background:#fff;color:#1f2937;border:1px solid rgba(18,33,61,.15)}
   .course-live-link.apple{background:#111827;color:#fff;border:1px solid #111827}
-  .filter-chip{border:1px solid var(--line);background:var(--paper-card);color:var(--ink-soft);border-radius:999px;padding:8px 11px;font:600 12px 'Work Sans';white-space:nowrap}
-  .filter-chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy)}
-  .course-map-wrap{position:relative;height:calc(100vh - 330px);min-height:390px}
-  #courseMap{height:100%;width:100%}
-  .course-status{position:absolute;z-index:500;top:10px;left:12px;right:12px;background:rgba(18,33,61,.93);color:var(--paper);padding:9px 12px;border-radius:9px;font-size:12px;text-align:center}
-  .shop-pin{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50% 50% 50% 0;background:#8b4d7d;border:2px solid var(--paper-card);transform:rotate(-45deg);box-shadow:0 2px 5px rgba(18,33,61,.35)}
-  .shop-pin span{transform:rotate(45deg);font-size:12px}
   .sos-fab{position:fixed;z-index:1200;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.65);background:#a92c32;color:#fff;font-weight:800;font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer}
   .modal-backdrop{display:none;position:fixed;inset:0;z-index:1500;background:rgba(10,21,38,.72);padding:calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));align-items:flex-end;justify-content:center}
   .modal-backdrop.open{display:flex}
+  /* La fenêtre de choix Hôpital/Pharmacie doit rester au-dessus du panneau SOS. */
+  #sosModal{z-index:1500;}
+  #sosSearchModal{z-index:1800;}
+  #sosSearchModal .sos-sheet{position:relative;z-index:1801;}
   .sos-sheet{width:min(100%,560px);background:var(--paper-card);border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
   .sos-sheet h2{font-family:'Fraunces',serif;color:var(--navy);margin:0 0 5px}
   .sos-sheet p{font-size:12px;color:var(--ink-soft);margin:0 0 14px}
@@ -591,6 +616,11 @@
   .badge-celebration{position:fixed;z-index:2100;left:50%;top:50%;transform:translate(-50%,-50%) scale(.8);background:var(--navy);color:white;border:2px solid var(--brass);border-radius:18px;padding:20px;text-align:center;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 12px 40px rgba(0,0,0,.4)}
   .badge-celebration.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
   .badge-celebration .big{font-size:42px}.badge-celebration strong{display:block;margin-top:5px;font-family:'Fraunces';font-size:18px}
+  .eclipse-card{margin-top:14px;padding:14px;border-radius:16px;background:linear-gradient(135deg,#19152f,#44316d);color:#fff;box-shadow:0 8px 22px rgba(31,22,58,.2);border:1px solid rgba(255,255,255,.14)}
+  .eclipse-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}.eclipse-icon{font-size:30px}.eclipse-title{font:800 15px 'Fraunces',serif}.eclipse-sub{font-size:11px;opacity:.78;margin-top:1px}
+  .eclipse-times{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.eclipse-time{background:rgba(255,255,255,.1);border-radius:11px;padding:8px 5px;text-align:center}.eclipse-time strong{display:block;font-size:13px}.eclipse-time span{font-size:9.5px;opacity:.76;text-transform:uppercase;letter-spacing:.04em}
+  .eclipse-safety{font-size:11px;line-height:1.45;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;margin-bottom:9px}.eclipse-safety b{color:#ffe49a}
+  .eclipse-actions{display:flex;gap:8px;flex-wrap:wrap}.eclipse-badge-btn,.eclipse-map-btn{border:0;border-radius:999px;padding:9px 12px;font:800 11px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.eclipse-badge-btn{background:#ffe08a;color:#281f3c}.eclipse-badge-btn.unlocked{background:#5bd6a2;color:#103528}.eclipse-map-btn{background:rgba(255,255,255,.14);color:#fff}
 
   .weather-card{margin-top:10px;border:1px solid rgba(201,160,92,.35);background:rgba(239,231,213,.08);border-radius:12px;padding:10px 12px;color:var(--paper);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;width:100%}
   .weather-icon{font-size:28px;line-height:1}.weather-main{flex:1;min-width:0}.weather-title{font-weight:700;font-size:12px}.weather-detail{font-size:11px;color:rgba(239,231,213,.72);margin-top:2px}.weather-temp{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--brass-soft)}
@@ -751,7 +781,7 @@
     <div class="progress-label" id="progressLabel">0 / 17</div>
   </div>
   <div class="family-bar">
-    <button class="family-chip" id="badgesBtn">🏆 Badges <span id="badgeCount">0</span>/17</button>
+    <button class="family-chip" id="badgesBtn">🏆 Badges <span id="badgeCount">0</span>/18</button>
     <button class="family-chip" id="syncBtn"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Mode local</span></button>
   </div>
   <button class="weather-card" id="weatherCard" type="button" aria-label="Afficher la météo locale">
@@ -775,6 +805,12 @@
 </main>
 
 <div id="mapView" class="map-view">
+  <div class="map-filters" aria-label="Filtres de la carte">
+    <button class="map-filter active" data-map-filter="all">Tout</button>
+    <button class="map-filter" data-map-filter="stay">🏠 Logements</button>
+    <button class="map-filter" data-map-filter="visit">🏛️ Visites</button>
+    <button class="map-filter" data-map-filter="resto">🍽️ Restos</button>
+  </div>
   <div id="map"></div>
   <button id="locateBtn" class="locate-btn">📍 Me localiser</button>
 </div>
@@ -795,24 +831,27 @@
 
 
 <div id="courseView" class="course-view">
-  <div class="course-toolbar" aria-label="Filtres commerces">
-    <button class="filter-chip active" data-shop="all">Tout</button>
-    <button class="filter-chip" data-shop="supermarket">Supermarchés</button>
-    <button class="filter-chip" data-shop="bakery">Boulangeries</button>
-    <button class="filter-chip" data-shop="convenience">Épiceries</button>
-    <button class="filter-chip" data-shop="butcher">Boucheries</button>
-  </div>
-  <div class="course-locate-wrap">
-    <button id="courseLocateBtn" class="course-locate-btn">📍 Trouver des courses autour de moi</button>
-    <div class="course-permission-hint">Safari demandera l’autorisation d’utiliser ta position.</div>
-  </div>
-  <div id="courseLiveActions" class="course-live-actions" aria-live="polite">
-    <a id="courseGoogleLive" class="course-live-link google" target="_blank" rel="noopener">🗺️ Google Maps</a>
-    <a id="courseAppleLive" class="course-live-link apple" target="_blank" rel="noopener"> Apple Plans</a>
-  </div>
-  <div class="course-map-wrap">
-    <div id="courseStatus" class="course-status">Appuie sur le bouton ci-dessus pour afficher les commerces autour de toi.</div>
-    <div id="courseMap"></div>
+  <div class="course-shell">
+    <section class="course-hero">
+      <h2>Que cherches-tu ?</h2>
+      <p>Choisis un type de commerce, localise-toi, puis ouvre la recherche dans Apple Plans ou Google Maps.</p>
+    </section>
+    <div class="course-section-title">Type de commerce</div>
+    <div class="course-toolbar" aria-label="Filtres commerces">
+      <button class="filter-chip active" data-shop="supermarket">🛒 Supermarchés</button>
+      <button class="filter-chip" data-shop="bakery">🥖 Boulangeries</button>
+      <button class="filter-chip" data-shop="convenience">🧺 Épiceries</button>
+      <button class="filter-chip" data-shop="butcher">🥩 Boucheries</button>
+    </div>
+    <div class="course-locate-wrap">
+      <button id="courseLocateBtn" class="course-locate-btn">📍 Utiliser ma position</button>
+      <div class="course-permission-hint">Safari demandera l’autorisation d’utiliser ta position.</div>
+    </div>
+    <div id="courseStatus" class="course-status">Choisis une catégorie puis utilise ta position.</div>
+    <div id="courseLiveActions" class="course-live-actions" aria-live="polite">
+      <a id="courseAppleLive" class="course-live-link apple" target="_blank" rel="noopener"> Apple Plans</a>
+      <a id="courseGoogleLive" class="course-live-link google" target="_blank" rel="noopener">🗺️ Google Maps</a>
+    </div>
   </div>
 </div>
 
@@ -861,7 +900,7 @@
 <div id="badgesModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="badgesTitle">
   <div class="sos-sheet">
     <h2 id="badgesTitle">Badges du voyage</h2>
-    <p>Chaque journée terminée débloque un souvenir.</p>
+    <p>Chaque journée terminée débloque un souvenir, avec un badge spécial pour l’éclipse.</p>
     <div id="badgesList"></div>
     <button class="sos-close" id="badgesCloseBtn">Fermer</button>
   </div>
@@ -956,7 +995,7 @@ const days = [
     {t:"Déjeuner : brasserie traditionnelle (Nürnberger Rostbratwürste)"},
     {t:"Départ pour Leipzig", cls:"strong"}
   ]},
-  { n:8, date:"Mer. 12 août", ville:"Leipzig", addr:null, prog:[
+  { n:8, date:"Mer. 12 août", ville:"Leipzig", addr:null, eclipse:true, prog:[
     {t:"Nikolaikirche, Augustusplatz, quartier de Plagwitz"},
     {t:"Départ pour Berlin (2h)", cls:"strong"},
     {t:"Télécharger BVG Fahrinfo et DB Navigator ; si besoin, ticket groupe journée (jusqu'à 5 pers.)"}
@@ -1101,6 +1140,25 @@ function stayReturnHtml(dayNumber){
   </div>`;
 }
 
+const ECLIPSE_STORAGE_KEY = "roadtrip-eclipse-seen";
+let eclipseSeen = localStorage.getItem(ECLIPSE_STORAGE_KEY) === "true";
+
+function eclipseCardHtml(){
+  return `<section class="eclipse-card" aria-label="Éclipse solaire du 12 août 2026">
+    <div class="eclipse-head"><div class="eclipse-icon">🌒</div><div><div class="eclipse-title">Éclipse solaire ce soir</div><div class="eclipse-sub">Visible à Leipzig ou Berlin · horizon ouest dégagé</div></div></div>
+    <div class="eclipse-times">
+      <div class="eclipse-time"><span>Début</span><strong>19 h 15</strong></div>
+      <div class="eclipse-time"><span>Maximum</span><strong>20 h 08</strong></div>
+      <div class="eclipse-time"><span>Fin</span><strong>20 h 38</strong></div>
+    </div>
+    <div class="eclipse-safety">🥽 <b>Lunettes spéciales éclipse uniquement.</b><br>🚫 Lunettes de soleil insuffisantes · ne jamais regarder le Soleil directement.</div>
+    <div class="eclipse-actions">
+      <button type="button" id="eclipseBadgeBtn" class="eclipse-badge-btn ${eclipseSeen?'unlocked':''}">${eclipseSeen?'✓ Badge débloqué':'🏆 J’y étais !'}</button>
+      <button type="button" id="eclipseMapBtn" class="eclipse-map-btn">🗺️ Voir sur la carte</button>
+    </div>
+  </section>`;
+}
+
 const badges = [
   ["🥨","Explorateur de Strasbourg"],["⛪","Maître de la cathédrale"],["🎢","Survivant d’Europa-Park"],["🎠","Double dose de sensations"],
   ["🚘","Pilote de Stuttgart"],["📜","Gardien de la mémoire"],["🏰","Chevalier de Nuremberg"],["🎨","Éclaireur de Leipzig"],
@@ -1168,6 +1226,7 @@ days.forEach(d => {
           ${addrHtml}
           <ul class="prog">${progItems}</ul>
           ${stayReturnHtml(d.n)}
+          ${d.eclipse ? eclipseCardHtml() : ''}
           ${d.addr ? `<div class="action-row">
             <a class="action-link apple" href="https://maps.apple.com/?q=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener"> Plans</a>
             <a class="action-link google" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.addr + (d.addr2 ? ', '+d.addr2 : ''))}" target="_blank" rel="noopener">Google Maps</a>
@@ -1214,7 +1273,7 @@ function updateProgress(){
   const pct = Math.round((done.length / days.length) * 100);
   fill.style.width = pct + '%';
   label.textContent = `${done.length} / ${days.length}`;
-  const bc=document.getElementById('badgeCount'); if(bc) bc.textContent=done.length;
+  const bc=document.getElementById('badgeCount'); if(bc) bc.textContent=done.length + (eclipseSeen?1:0);
 }
 
 updateProgress();
@@ -1233,7 +1292,8 @@ function refreshDoneUI(){
 }
 function renderBadges(){
   const list=document.getElementById('badgesList'); if(!list) return;
-  list.innerHTML=badges.map((b,i)=>`<div class="badge-card ${done.includes(i+1)?'':'locked'}"><div class="badge-icon">${b[0]}</div><div><div class="badge-title">${b[1]}</div><div class="badge-sub">${done.includes(i+1)?'Débloqué — Jour '+(i+1):'À débloquer au Jour '+(i+1)}</div></div></div>`).join('');
+  list.innerHTML=badges.map((b,i)=>`<div class="badge-card ${done.includes(i+1)?'':'locked'}"><div class="badge-icon">${b[0]}</div><div><div class="badge-title">${b[1]}</div><div class="badge-sub">${done.includes(i+1)?'Débloqué — Jour '+(i+1):'À débloquer au Jour '+(i+1)}</div></div></div>`).join('') +
+    `<div class="badge-card ${eclipseSeen?'':'locked'}"><div class="badge-icon">🌒</div><div><div class="badge-title">Chasseur d’éclipse</div><div class="badge-sub">${eclipseSeen?'Débloqué — 12 août 2026':'À débloquer avec “J’y étais !”'}</div></div></div>`;
 }
 function celebrateBadge(n){
   const b=badges[n-1]; if(!b) return;
@@ -1245,6 +1305,22 @@ function celebrateBadge(n){
 document.getElementById('badgesBtn').addEventListener('click',()=>{renderBadges();document.getElementById('badgesModal').classList.add('open')});
 document.getElementById('badgesCloseBtn').addEventListener('click',()=>document.getElementById('badgesModal').classList.remove('open'));
 document.getElementById('badgesModal').addEventListener('click',e=>{if(e.target.id==='badgesModal')e.currentTarget.classList.remove('open')});
+
+function celebrateEclipseBadge(){
+  document.getElementById('celebrationIcon').textContent='🌒';
+  document.getElementById('celebrationTitle').textContent='Chasseur d’éclipse';
+  const box=document.getElementById('badgeCelebration'); box.classList.add('show');
+  setTimeout(()=>box.classList.remove('show'),1800);
+}
+document.addEventListener('click',e=>{
+  const badgeBtn=e.target.closest('#eclipseBadgeBtn');
+  if(badgeBtn){
+    if(!eclipseSeen){ eclipseSeen=true; localStorage.setItem(ECLIPSE_STORAGE_KEY,'true'); celebrateEclipseBadge(); pushFamilyProgress(done); }
+    badgeBtn.textContent='✓ Badge débloqué'; badgeBtn.classList.add('unlocked'); updateProgress(); renderBadges();
+  }
+  const mapBtn=e.target.closest('#eclipseMapBtn');
+  if(mapBtn){ showTab('map'); setTimeout(()=>focusEclipsePoint(),160); }
+});
 
 function closeStayReturnSheet(){
   document.getElementById('stayReturnModal').classList.remove('open');
@@ -1317,7 +1393,7 @@ function attachFamilyDocument(){
   familyDoc=firebase.firestore().collection('roadtrips').doc(window.ROADTRIP_FAMILY_CODE || 'dib-europe-2026');
   familyUnsubscribe=familyDoc.onSnapshot(snap=>{
     if(!snap.exists){
-      familyDoc.set({done,polarstepsUrl:DEFAULT_POLARSTEPS_URL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      familyDoc.set({done,eclipseSeen,polarstepsUrl:DEFAULT_POLARSTEPS_URL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
       polarstepsUrl=DEFAULT_POLARSTEPS_URL; refreshPolarstepsUI(); return;
     }
     const data=snap.data()||{};
@@ -1325,7 +1401,11 @@ function attachFamilyDocument(){
     polarstepsUrl=(data.polarstepsUrl||DEFAULT_POLARSTEPS_URL).trim();
     if(!data.polarstepsUrl){ familyDoc.set({polarstepsUrl:DEFAULT_POLARSTEPS_URL},{merge:true}).catch(()=>{}); }
     applyingRemote=true; done=[...new Set(remote)].sort((a,b)=>a-b);
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(done)); refreshDoneUI(); applyingRemote=false;
+    eclipseSeen=Boolean(data.eclipseSeen);
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(done));
+    localStorage.setItem(ECLIPSE_STORAGE_KEY,String(eclipseSeen));
+    refreshDoneUI(); applyingRemote=false;
+    const eclipseBtn=document.getElementById('eclipseBadgeBtn'); if(eclipseBtn){eclipseBtn.textContent=eclipseSeen?'✓ Badge débloqué':'🏆 J’y étais !';eclipseBtn.classList.toggle('unlocked',eclipseSeen);}
     refreshPolarstepsUI();
     setSyncState('online','Famille synchronisée');
   },err=>{ console.warn('Écoute Firestore:',err); setSyncState('offline','Sync indisponible'); });
@@ -1359,7 +1439,7 @@ document.getElementById('familyPasswordToggle').addEventListener('click',()=>{
 });
 async function pushFamilyProgress(arr){
   if(!familyDoc || applyingRemote) return;
-  try{ await familyDoc.set({done:arr,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}); }
+  try{ await familyDoc.set({done:arr,eclipseSeen,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}); }
   catch(e){ console.warn('Écriture Firestore:',e); setSyncState('offline','Sync en attente'); }
 }
 document.getElementById('syncBtn').addEventListener('click',()=>{
@@ -1440,8 +1520,6 @@ function showTab(tab){
   } else if(tab === 'course'){
     tabBtnCourse.classList.add('active');
     courseView.classList.add('active');
-    initCourseMap();
-    setTimeout(() => { if(window._courseMap) window._courseMap.invalidateSize(); }, 60);
   } else if(tab === 'resto'){
     tabBtnResto.classList.add('active');
     restoView.classList.add('active');
@@ -1475,14 +1553,85 @@ const stops = [
   { name:"Stuttgart", days:"Jour 5", lat:48.7758, lng:9.1829 },
   { name:"Nuremberg", days:"Jours 6–7", lat:49.4521, lng:11.0767 },
   { name:"Leipzig", days:"Jour 8", lat:51.3397, lng:12.3731 },
-  { name:"Berlin", days:"Jours 9–12", lat:52.5200, lng:13.4050 },
-  { name:"Amsterdam", days:"Jours 13–14", lat:52.3676, lng:4.9041 },
-  { name:"Bruxelles", days:"Jours 15–16", lat:50.8503, lng:4.3517 },
-  { name:"Chevaigné", days:"Jour 17 — Retour", lat:48.1836, lng:-1.5589 }
+  { name:"Berlin", days:"Jours 9–13", lat:52.5200, lng:13.4050 },
+  { name:"Amsterdam", days:"Jours 13–15", lat:52.3676, lng:4.9041 },
+  { name:"Bruxelles", days:"Jours 15–17", lat:50.8503, lng:4.3517 },
+  { name:"Chevaigné", days:"Retour", lat:48.1836, lng:-1.5589 }
+];
+
+const stayMapPoints = [
+  {name:"Logement Strasbourg",day:"Jours 1–2",address:"13 Rue Jean-Paul de Dadelsen, 67200 Strasbourg",lat:48.5954,lng:7.7135},
+  {name:"Pension Mimosa",day:"Jours 3–4",address:"Hindenburgstraße 3, 77977 Rust",lat:48.2670,lng:7.7270},
+  {name:"Hotel Allee 25",day:"Jour 5",address:"Marbacher Straße 32, 70435 Stuttgart",lat:48.8324,lng:9.1675},
+  {name:"Logement de Sven",day:"Jours 5–7",address:"Tafelfeldstraße 21, 90443 Nürnberg",lat:49.4435,lng:11.0770},
+  {name:"Appartement d’Olga",day:"Jours 7–8",address:"Seelenbinderstraße 4, 04159 Leipzig",lat:51.3737,lng:12.3510},
+  {name:"East Side Apartment",day:"Jours 8–13",address:"Pflugstraße 4, 10115 Berlin",lat:52.5320,lng:13.3820},
+  {name:"MEININGER Amsterdam Amstel",day:"Jours 13–15",address:"Julianaplein 6, 1097 DN Amsterdam",lat:52.3468,lng:4.9177},
+  {name:"Citadines Sainte-Catherine",day:"Jours 15–17",address:"51 Quai au Bois à Brûler, 1000 Bruxelles",lat:50.8515,lng:4.3470}
+];
+
+const visitMapPoints = [
+  {name:"Petite France",day:"Jour 1",address:"La Petite France, Strasbourg",lat:48.5810,lng:7.7390},
+  {name:"Barrage Vauban",day:"Jour 1",address:"Place du Quartier Blanc, Strasbourg",lat:48.5791,lng:7.7386},
+  {name:"Cathédrale de Strasbourg",day:"Jour 2",address:"Place de la Cathédrale, Strasbourg",lat:48.5819,lng:7.7508},
+  {name:"Palais Rohan",day:"Jour 2",address:"2 Place du Château, Strasbourg",lat:48.5812,lng:7.7520},
+  {name:"Batorama",day:"Jour 2",address:"Place du Marché aux Poissons, Strasbourg",lat:48.5803,lng:7.7519},
+  {name:"Europa-Park",day:"Jours 3–4",address:"Europa-Park-Straße 2, 77977 Rust",lat:48.2660,lng:7.7225},
+  {name:"Musée Mercedes-Benz",day:"Jour 5",address:"Mercedesstraße 100, Stuttgart",lat:48.7881,lng:9.2339},
+  {name:"Schlossplatz Stuttgart",day:"Jour 5",address:"Schloßplatz, Stuttgart",lat:48.7785,lng:9.1799},
+  {name:"Centre de documentation nazi",day:"Jour 6",address:"Bayernstraße 110, Nürnberg",lat:49.4326,lng:11.1128},
+  {name:"Zeppelinfeld",day:"Jour 6",address:"Zeppelinstraße, Nürnberg",lat:49.4264,lng:11.1250},
+  {name:"Palais de Justice – Salle 600",day:"Jour 6",address:"Fürther Straße 110, Nürnberg",lat:49.4578,lng:11.0481},
+  {name:"Château impérial de Nuremberg",day:"Jour 7",address:"Burg 17, Nürnberg",lat:49.4579,lng:11.0750},
+  {name:"Hauptmarkt",day:"Jour 7",address:"Hauptmarkt, Nürnberg",lat:49.4541,lng:11.0771},
+  {name:"Nikolaikirche Leipzig",day:"Jour 8",address:"Nikolaikirchhof 3, Leipzig",lat:51.3402,lng:12.3780},
+  {name:"Augustusplatz",day:"Jour 8",address:"Augustusplatz, Leipzig",lat:51.3391,lng:12.3810},
+  {name:"Plagwitz",day:"Jour 8",address:"Plagwitz, Leipzig",lat:51.3267,lng:12.3335},
+  {name:"Mémorial de l’Holocauste",day:"Jour 9",address:"Cora-Berliner-Straße 1, Berlin",lat:52.5139,lng:13.3787},
+  {name:"Porte de Brandebourg",day:"Jour 9",address:"Pariser Platz, Berlin",lat:52.5163,lng:13.3777},
+  {name:"Reichstag",day:"Jour 9",address:"Platz der Republik 1, Berlin",lat:52.5186,lng:13.3762},
+  {name:"Potsdamer Platz",day:"Jour 9",address:"Potsdamer Platz, Berlin",lat:52.5096,lng:13.3760},
+  {name:"Mémorial du Mur – Bernauer Straße",day:"Jour 10",address:"Bernauer Straße 111, Berlin",lat:52.5351,lng:13.3903},
+  {name:"Topographie de la Terreur",day:"Jour 10",address:"Niederkirchnerstraße 8, Berlin",lat:52.5069,lng:13.3827},
+  {name:"Checkpoint Charlie",day:"Jour 10",address:"Friedrichstraße 43-45, Berlin",lat:52.5075,lng:13.3904},
+  {name:"Fernsehturm",day:"Jour 11",address:"Panoramastraße 1A, Berlin",lat:52.5208,lng:13.4094},
+  {name:"Alexanderplatz",day:"Jour 11",address:"Alexanderplatz, Berlin",lat:52.5219,lng:13.4132},
+  {name:"Île aux Musées",day:"Jour 11",address:"Museumsinsel, Berlin",lat:52.5169,lng:13.4010},
+  {name:"East Side Gallery",day:"Jour 12",address:"Mühlenstraße 3-100, Berlin",lat:52.5050,lng:13.4397},
+  {name:"Oberbaumbrücke",day:"Jour 12",address:"Oberbaumbrücke, Berlin",lat:52.5019,lng:13.4450},
+  {name:"RAW-Gelände",day:"Jour 12",address:"Revaler Straße 99, Berlin",lat:52.5078,lng:13.4544},
+  {name:"Mémorial de Sachsenhausen",day:"Jour 13",address:"Straße der Nationen 22, Oranienburg",lat:52.7652,lng:13.2629},
+  {name:"Place du Dam",day:"Jour 14",address:"Dam, Amsterdam",lat:52.3731,lng:4.8922},
+  {name:"Jordaan",day:"Jour 14",address:"Jordaan, Amsterdam",lat:52.3752,lng:4.8838},
+  {name:"Les Neuf Rues",day:"Jour 14",address:"De 9 Straatjes, Amsterdam",lat:52.3697,lng:4.8844},
+  {name:"Quartier rouge",day:"Jour 14",address:"De Wallen, Amsterdam",lat:52.3744,lng:4.8980},
+  {name:"Place Sainte-Catherine",day:"Jour 15",address:"Place Sainte-Catherine, Bruxelles",lat:50.8504,lng:4.3475},
+  {name:"Grand-Place",day:"Jours 15–16",address:"Grand-Place, Bruxelles",lat:50.8467,lng:4.3525},
+  {name:"Galeries Royales Saint-Hubert",day:"Jour 16",address:"Galerie du Roi 5, Bruxelles",lat:50.8474,lng:4.3553},
+  {name:"Manneken-Pis",day:"Jour 16",address:"Rue de l’Étuve 46, Bruxelles",lat:50.8449,lng:4.3499},
+  {name:"Éclipse solaire — horizon ouest",day:"Jour 8 · 12 août · 19 h 15–20 h 38",address:"Tempelhofer Feld, Berlin",lat:52.4730,lng:13.4030,eclipse:true}
 ];
 
 let mapInitialized = false;
 let watchId = null;
+
+function mapNavLinks(point){
+  const q=encodeURIComponent(point.address || point.name);
+  const apple=`https://maps.apple.com/?q=${q}&ll=${point.lat},${point.lng}`;
+  const google=`https://www.google.com/maps/search/?api=1&query=${q}`;
+  const waze=`https://www.waze.com/ul?ll=${point.lat},${point.lng}&navigate=yes`;
+  return `<div class="map-popup-actions"><a href="${apple}" target="_blank" rel="noopener"> Plans</a><a href="${google}" target="_blank" rel="noopener">Google</a><a href="${waze}" target="_blank" rel="noopener">Waze</a></div>`;
+}
+
+function poiIcon(type, point=null){
+  const emoji=point && point.eclipse ? '🌒' : type==='stay'?'🏠':type==='resto'?'🍽️':'🏛️';
+  return L.divIcon({className:'',html:`<div class="poi-pin ${type}">${emoji}</div>`,iconSize:[28,28],iconAnchor:[14,14]});
+}
+function focusEclipsePoint(){
+  const point=visitMapPoints.find(p=>p.eclipse); const map=window._leafletMap; if(!point||!map) return;
+  map.setView([point.lat,point.lng],14);
+  if(window._eclipseMarker) window._eclipseMarker.openPopup();
+}
 
 function initMap(){
   if(mapInitialized) return;
@@ -1490,28 +1639,44 @@ function initMap(){
 
   const map = L.map('map', { zoomControl: true }).setView([50.5, 7], 5);
   window._leafletMap = map;
+  window._mapPoiLayers = {stay:L.layerGroup().addTo(map), visit:L.layerGroup().addTo(map), resto:L.layerGroup().addTo(map)};
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap',
-    maxZoom: 19
+    attribution: '&copy; OpenStreetMap', maxZoom: 19
   }).addTo(map);
 
   const latlngs = stops.map(s => [s.lat, s.lng]);
   L.polyline(latlngs, { color: '#C9A05C', weight: 3, dashArray: '1,8', lineCap:'round' }).addTo(map);
 
   stops.forEach((s, i) => {
-    const icon = L.divIcon({
-      className: '',
-      html: `<div class="stop-pin"><span>${i === 0 ? '' : (i === stops.length-1 ? '' : i)}</span></div>`,
-      iconSize: [26,26],
-      iconAnchor: [13,26]
-    });
-    L.marker([s.lat, s.lng], { icon })
-      .addTo(map)
-      .bindPopup(`<div class="popup-title">${s.name}</div>${s.days}`);
+    const icon = L.divIcon({className:'',html:`<div class="stop-pin"><span>${i===0||i===stops.length-1?'':i}</span></div>`,iconSize:[26,26],iconAnchor:[13,26]});
+    L.marker([s.lat,s.lng],{icon}).addTo(map).bindPopup(`<div class="popup-title">${s.name}</div>${s.days}`);
   });
 
-  map.fitBounds(latlngs, { padding: [30,30] });
+  stayMapPoints.forEach(p=>L.marker([p.lat,p.lng],{icon:poiIcon('stay')}).addTo(window._mapPoiLayers.stay)
+    .bindPopup(`<div class="popup-title">🏠 ${p.name}</div><div class="map-popup-meta">${p.day}<br>${p.address}</div>${mapNavLinks(p)}`));
+
+  visitMapPoints.forEach(p=>{
+    const marker=L.marker([p.lat,p.lng],{icon:poiIcon('visit',p)}).addTo(window._mapPoiLayers.visit)
+      .bindPopup(`<div class="popup-title">${p.eclipse?'🌒':'🏛️'} ${p.name}</div><div class="map-popup-meta">${p.day}<br>${p.address}</div>${mapNavLinks(p)}`);
+    if(p.eclipse) window._eclipseMarker=marker;
+  });
+
+  restaurants.flatMap(g=>g.items.map(r=>({...r,day:g.city,address:r.addr}))).forEach(p=>
+    L.marker([p.lat,p.lng],{icon:poiIcon('resto')}).addTo(window._mapPoiLayers.resto)
+      .bindPopup(`<div class="popup-title">🍽️ ${p.name}</div><div class="map-popup-meta">${p.day}<br>${p.address}<br>★ ${p.rating.toFixed(1)}</div>${mapNavLinks(p)}`));
+
+  document.querySelectorAll('.map-filter').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.map-filter').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    const selected=btn.dataset.mapFilter;
+    Object.entries(window._mapPoiLayers).forEach(([type,layer])=>{
+      const show=selected==='all'||selected===type;
+      if(show&&!map.hasLayer(layer)) layer.addTo(map);
+      if(!show&&map.hasLayer(layer)) map.removeLayer(layer);
+    });
+  }));
+
+  map.fitBounds(latlngs, { padding: [35,35] });
 }
 
 document.getElementById('locateBtn').addEventListener('click', () => {
@@ -1582,7 +1747,9 @@ const restaurants = [
   { city:"Berlin", items:[
     { name:"BLESS Restaurant", rating:4.8, count:2245, addr:"Hausvogteipl. 10, 10117 Berlin", lat:52.5124086, lng:13.3967904 },
     { name:"Beast Berlin", rating:4.7, count:1837, addr:"Karl-Liebknecht-Str. 29, 10178 Berlin", lat:52.5247687, lng:13.4121757 },
-    { name:"PeterPaul", rating:4.7, count:1355, addr:"Torstraße 99, 10119 Berlin", lat:52.5299794, lng:13.4042659 }
+    { name:"PeterPaul", rating:4.7, count:1355, addr:"Torstraße 99, 10119 Berlin", lat:52.5299794, lng:13.4042659 },
+    { name:"Rüyam Gemüse Kebab", rating:4.7, count:291, addr:"Hauptstraße 36, 10827 Berlin", lat:52.48718, lng:13.35390, phone:"+493069564413", cuisine:"Gemüse döner · halal", price:"€" },
+    { name:"Mustafa’s Gemüse Kebap", rating:4.3, count:4665, addr:"Mehringdamm 33, 10961 Berlin", lat:52.4934, lng:13.3889, cuisine:"Kebab emblématique", price:"€" }
   ]},
   { city:"Amsterdam", items:[
     { name:"Lucky Duck Amsterdam", rating:4.9, count:1088, addr:"Voetboogstraat 13, 1012 XK Amsterdam", lat:52.3682283, lng:4.8908089 },
@@ -1808,21 +1975,9 @@ async function searchNearbyRestaurants(lat, lng, map, btn){
 }
 
 
-/* ---------- Courses autour de moi : résultats actualisés via Plans / Google Maps ---------- */
-let courseMapInitialized = false;
-let courseFilter = 'all';
-function initCourseMap(){
-  if(courseMapInitialized) return;
-  courseMapInitialized = true;
-  const map = L.map('courseMap').setView([50.2, 7.2], 5);
-  window._courseMap = map;
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap', maxZoom:19
-  }).addTo(map);
-}
-
+/* ---------- Courses autour de moi : recherche dans Plans / Google Maps ---------- */
+let courseFilter = 'supermarket';
 const courseSearchTerms={
-  all:'supermarché',
   supermarket:'supermarché',
   bakery:'boulangerie',
   convenience:'épicerie',
@@ -1830,14 +1985,14 @@ const courseSearchTerms={
 };
 
 function updateLiveCourseLinks(lat,lng){
-  const term=courseSearchTerms[courseFilter] || courseSearchTerms.all;
+  const term=courseSearchTerms[courseFilter] || courseSearchTerms.supermarket;
   const q=encodeURIComponent(term);
   const google=document.getElementById('courseGoogleLive');
   const apple=document.getElementById('courseAppleLive');
   google.href=`https://www.google.com/maps/search/?api=1&query=${q}&center=${lat},${lng}`;
   apple.href=`https://maps.apple.com/?q=${q}&sll=${lat},${lng}&z=14`;
   document.getElementById('courseLiveActions').classList.add('visible');
-  document.getElementById('courseStatus').textContent=`Position trouvée. Choisis Google Maps ou Apple Plans : une recherche « ${term} » sera lancée autour de ta position.`;
+  document.getElementById('courseStatus').textContent=`Prêt : recherche « ${term} » autour de ta position.`;
 }
 
 document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -1847,6 +2002,9 @@ document.querySelectorAll('.filter-chip').forEach(chip => {
     courseFilter = chip.dataset.shop;
     if(window._lastCoursePosition){
       updateLiveCourseLinks(window._lastCoursePosition.lat, window._lastCoursePosition.lng);
+    } else {
+      const term=courseSearchTerms[courseFilter];
+      document.getElementById('courseStatus').textContent=`Catégorie choisie : ${term}. Appuie maintenant sur « Utiliser ma position ».`;
     }
   });
 });
@@ -1858,14 +2016,10 @@ document.getElementById('courseLocateBtn').addEventListener('click', () => {
   navigator.geolocation.getCurrentPosition(pos => {
     const lat=pos.coords.latitude, lng=pos.coords.longitude;
     window._lastCoursePosition={lat,lng};
-    initCourseMap();
-    const map=window._courseMap; map.setView([lat,lng],15);
-    if(window._courseMe) map.removeLayer(window._courseMe);
-    window._courseMe=L.circleMarker([lat,lng],{radius:8,color:'#3F6C63',fillColor:'#3F6C63',fillOpacity:1,weight:3}).addTo(map).bindPopup('Vous êtes ici').openPopup();
     updateLiveCourseLinks(lat,lng);
     btn.disabled=false; btn.textContent='📍 Actualiser ma position';
   }, err => {
-    btn.disabled=false; btn.textContent='📍 Trouver des courses autour de moi';
+    btn.disabled=false; btn.textContent='📍 Utiliser ma position';
     alert(err.code===1 ? "Localisation refusée. Autorise la position pour Safari dans Réglages." : "Position indisponible : "+err.message);
   }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
 });
@@ -1904,7 +2058,10 @@ document.getElementById('copyPositionBtn').addEventListener('click',()=>withCurr
   catch(e){prompt('Copie cette position :',text);}
 }));
 const sosSearchModal=document.getElementById('sosSearchModal');
-function closeSosSearch(){ sosSearchModal.classList.remove('open'); }
+function closeSosSearch(){
+  sosSearchModal.classList.remove('open');
+  sosModal.setAttribute('aria-hidden','false');
+}
 document.getElementById('sosSearchClose').addEventListener('click',closeSosSearch);
 sosSearchModal.addEventListener('click',e=>{if(e.target===sosSearchModal)closeSosSearch()});
 function openNearbyHealthSearch(type){
@@ -1916,6 +2073,7 @@ function openNearbyHealthSearch(type){
     document.getElementById('sosSearchText').textContent='Recherche en temps réel autour de ta position actuelle.';
     document.getElementById('sosAppleSearch').href=`https://maps.apple.com/?q=${q}&sll=${lat},${lng}&z=14`;
     document.getElementById('sosGoogleSearch').href=`https://www.google.com/maps/search/?api=1&query=${q}&center=${lat},${lng}`;
+    sosModal.setAttribute('aria-hidden','true');
     sosSearchModal.classList.add('open');
   });
 }

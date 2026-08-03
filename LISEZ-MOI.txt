@@ -1,30 +1,9 @@
-ROADTRIP DIB 2026
+ROADTRIP DIB 2026 — V1.14 CARTE COMPLÈTE
 
-Cette version comprend :
-- itinéraire complet sur 17 jours ;
-- huit hébergements avec adresse, arrivée, départ, accès, parking et navigation ;
-- carte et géolocalisation ;
-- restaurants et courses autour de soi ;
-- météo locale ;
-- SOS ;
-- emplacement de la voiture ;
-- 17 badges ;
-- synchronisation familiale prête à configurer avec Firebase.
+Nouveauté : la carte affiche l’itinéraire, les 8 hébergements, les restaurants sélectionnés et les principaux lieux du programme.
+Filtres : Tout, Logements, Visites, Restos. Chaque fiche propose Apple Plans, Google Maps et Waze.
 
-MISE À JOUR GITHUB
-1. Décompresser le ZIP.
-2. Dans le dépôt GitHub, remplacer les fichiers existants par tout le contenu de ce dossier.
-3. Conserver le dossier icons à la racine.
-4. Attendre le nouveau déploiement GitHub Pages.
-
-La synchronisation reste en mode local tant que firebase-config.js n’est pas configuré.
+Déploiement : téléverser tout le contenu de ce dossier à la racine du dépôt GitHub Pages.
 
 
-Version moderne : navigation basse, cartes arrondies, nouvelle fiche restaurants et ajout du Tire-Bouchon à Strasbourg.
-
-VERSION V1.9 - POLARSTEPS
-- Nouvel onglet Polarsteps dans la barre de navigation.
-- Le lien du voyage est synchronisé par Firestore.
-- Il peut être remplacé depuis l'application sans republier GitHub.
-
-V1.11 : les boutons SOS « Hôpital proche » et « Pharmacie proche » utilisent la position GPS au moment de l'appui et proposent Apple Plans ou Google Maps.
+V1.16 : encart éclipse solaire du 12 août, badge Chasseur d’éclipse synchronisé et point d’observation sur la carte.
