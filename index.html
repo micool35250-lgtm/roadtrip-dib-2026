@@ -636,6 +636,9 @@
   .tab-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:0;color:#7A8496;font-size:18px;padding:7px 4px;border-radius:16px;letter-spacing:0;min-width:0}
   .tab-btn span{font-size:10px;font-weight:700}
   .tab-btn.active{background:#111827;color:white;box-shadow:0 7px 16px rgba(17,24,39,.24);transform:translateY(-1px)}
+  .tab-btn-sos{color:#B4232E}
+  .tab-btn-sos.active{background:#B4232E;color:white;box-shadow:0 7px 16px rgba(180,35,46,.25)}
+  .tabs .tab-btn{flex:1}
   main{padding:22px 13px 12px;background:var(--paper)}
   .timeline::before{left:25px;background:linear-gradient(var(--violet),var(--teal));width:2px;opacity:.28}
   .day{padding-left:51px;margin-bottom:13px}.day-dot{left:16px;width:19px;height:19px;border:3px solid white;background:var(--violet);box-shadow:0 0 0 2px rgba(124,92,252,.24)}
@@ -655,7 +658,6 @@
   .resto-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.resto-action{appearance:none;border:0;text-decoration:none;background:#F1F3F7;color:#273142;border-radius:11px;padding:8px 10px;font:700 11px 'Work Sans',sans-serif;cursor:pointer}.resto-action:first-child{background:#111827;color:white}.resto-action.call{background:#E8FBF5;color:#16785F}
   .course-view,.resto-view{background:var(--paper)}.course-toolbar{background:rgba(244,247,251,.92);backdrop-filter:blur(16px)}.filter-chip{border-radius:999px}
   .locate-btn{background:#111827;border:0;border-radius:14px;padding:12px 15px;box-shadow:0 9px 22px rgba(17,24,39,.25)}
-  .sos-fab{border-radius:14px!important;box-shadow:0 8px 22px rgba(255,75,75,.28)!important}
   .modal-backdrop{backdrop-filter:blur(8px)}.sos-sheet{border-radius:25px 25px 0 0!important}
   @media(min-width:700px){.tabs{left:50%;right:auto;width:520px;transform:translateX(-50%)}}
 
@@ -713,6 +715,7 @@
     <button class="tab-btn" data-tab="map" id="tabBtnMap">🗺️<span>Carte</span></button>
     <button class="tab-btn" data-tab="resto" id="tabBtnResto">🍽️<span>Restos</span></button>
     <button class="tab-btn" data-tab="course" id="tabBtnCourse">🛒<span>Courses</span></button>
+    <button class="tab-btn tab-btn-sos" data-tab="sos" id="tabBtnSos" aria-label="Urgences">🆘<span>SOS</span></button>
   </div>
 </header>
 
@@ -786,7 +789,6 @@
   </div>
 </div>
 <div id="badgeCelebration" class="badge-celebration"><div class="big" id="celebrationIcon">🏆</div><strong id="celebrationTitle"></strong><span>Badge débloqué !</span></div>
-<button id="sosBtn" class="sos-fab" aria-label="Urgence SOS">SOS</button>
 <div id="sosModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sosTitle">
   <div class="sos-sheet">
     <h2 id="sosTitle">Urgence</h2>
@@ -1205,6 +1207,8 @@ const tabBtnList = document.getElementById('tabBtnList');
 const tabBtnMap = document.getElementById('tabBtnMap');
 const tabBtnResto = document.getElementById('tabBtnResto');
 const tabBtnCourse = document.getElementById('tabBtnCourse');
+const tabBtnSos = document.getElementById('tabBtnSos');
+let tabBeforeSos = 'list';
 const listView = document.getElementById('listView');
 const listFooter = document.getElementById('listFooter');
 const mapView = document.getElementById('mapView');
@@ -1212,7 +1216,8 @@ const restoView = document.getElementById('restoView');
 const courseView = document.getElementById('courseView');
 
 function showTab(tab){
-  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse].forEach(b => b.classList.remove('active'));
+  tabBeforeSos = tab;
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
   listView.style.display = 'none';
   listFooter.style.display = 'none';
   mapView.classList.remove('active');
@@ -1243,6 +1248,11 @@ tabBtnList.addEventListener('click', () => showTab('list'));
 tabBtnMap.addEventListener('click', () => showTab('map'));
 tabBtnResto.addEventListener('click', () => showTab('resto'));
 tabBtnCourse.addEventListener('click', () => showTab('course'));
+tabBtnSos.addEventListener('click', () => {
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
+  tabBtnSos.classList.add('active');
+  document.getElementById('sosModal').classList.add('open');
+});
 
 /* ---------- Map ---------- */
 const stops = [
@@ -1681,9 +1691,14 @@ function saveCarPosition(){
 
 /* ---------- SOS ---------- */
 const sosModal=document.getElementById('sosModal');
-document.getElementById('sosBtn').addEventListener('click',()=>sosModal.classList.add('open'));
-document.getElementById('sosCloseBtn').addEventListener('click',()=>sosModal.classList.remove('open'));
-sosModal.addEventListener('click',e=>{if(e.target===sosModal)sosModal.classList.remove('open')});
+function closeSosModal(){
+  sosModal.classList.remove('open');
+  const activeMap={list:tabBtnList,map:tabBtnMap,resto:tabBtnResto,course:tabBtnCourse};
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
+  (activeMap[tabBeforeSos] || tabBtnList).classList.add('active');
+}
+document.getElementById('sosCloseBtn').addEventListener('click',closeSosModal);
+sosModal.addEventListener('click',e=>{if(e.target===sosModal)closeSosModal()});
 function withCurrentPosition(cb){
   if(!navigator.geolocation){ alert('Géolocalisation indisponible.'); return; }
   navigator.geolocation.getCurrentPosition(p=>cb(p.coords.latitude,p.coords.longitude),()=>alert('Impossible de récupérer la position.'),{enableHighAccuracy:true,timeout:10000});
