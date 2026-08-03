@@ -239,7 +239,7 @@
     transition: max-height .28s ease;
   }
   .day.open .card-body{
-    max-height: 900px;
+    max-height: 2200px;
   }
   .card-body-inner{
     padding: 0 16px 16px 16px;
@@ -629,7 +629,7 @@
   .eclipse-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}.eclipse-icon{font-size:30px}.eclipse-title{font:800 15px 'Fraunces',serif}.eclipse-sub{font-size:11px;opacity:.78;margin-top:1px}
   .eclipse-times{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}.eclipse-time{background:rgba(255,255,255,.1);border-radius:11px;padding:8px 5px;text-align:center}.eclipse-time strong{display:block;font-size:13px}.eclipse-time span{font-size:9.5px;opacity:.76;text-transform:uppercase;letter-spacing:.04em}
   .eclipse-safety{font-size:11px;line-height:1.45;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;margin-bottom:9px}.eclipse-safety b{color:#ffe49a}
-  .eclipse-actions{display:flex;gap:8px;flex-wrap:wrap}.eclipse-badge-btn,.eclipse-map-btn{border:0;border-radius:999px;padding:9px 12px;font:800 11px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.eclipse-badge-btn{background:#ffe08a;color:#281f3c}.eclipse-badge-btn.unlocked{background:#5bd6a2;color:#103528}.eclipse-map-btn{background:rgba(255,255,255,.14);color:#fff}
+  .eclipse-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.eclipse-badge-btn,.eclipse-map-btn{width:100%;min-height:42px;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 8px;font:800 11px 'Work Sans',sans-serif;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;line-height:1.2}.eclipse-badge-btn{background:#ffe08a;color:#281f3c}.eclipse-badge-btn.unlocked{background:#5bd6a2;color:#103528}.eclipse-map-btn{background:rgba(255,255,255,.16);color:#fff}@media(max-width:360px){.eclipse-actions{grid-template-columns:1fr}}
 
   .weather-card{margin-top:10px;border:1px solid rgba(201,160,92,.35);background:rgba(239,231,213,.08);border-radius:12px;padding:10px 12px;color:var(--paper);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;width:100%}
   .weather-icon{font-size:28px;line-height:1}.weather-main{flex:1;min-width:0}.weather-title{font-weight:700;font-size:12px}.weather-detail{font-size:11px;color:rgba(239,231,213,.72);margin-top:2px}.weather-temp{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--brass-soft)}
@@ -778,7 +778,7 @@
   @media(max-width:420px){.tabs{gap:2px;padding-left:6px;padding-right:6px}.tab-btn{padding-left:2px;padding-right:2px;font-size:17px}.tab-btn span{font-size:9px}.polar-actions{grid-template-columns:1fr}}
 
 
-  /* V1.18 — circuit complet et temps de route */
+  /* V1.19 — circuit complet et temps de route */
   .route-line{display:flex!important;flex-direction:column;gap:2px;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:10.5px!important;line-height:1.35!important;margin-bottom:13px!important}
   .route-line span{display:block;text-align:center}
   .travel-card{display:flex;align-items:center;gap:11px;margin:0 0 13px;padding:11px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(43,108,176,.10),rgba(91,44,160,.08));border:1px solid rgba(43,108,176,.18)}
@@ -1174,7 +1174,7 @@ function eclipseCardHtml(){
     </div>
     <div class="eclipse-safety">🥽 <b>Lunettes spéciales éclipse uniquement.</b><br>🚫 Lunettes de soleil insuffisantes · ne jamais regarder le Soleil directement.</div>
     <div class="eclipse-actions">
-      <button type="button" id="eclipseBadgeBtn" class="eclipse-badge-btn ${eclipseSeen?'unlocked':''}">${eclipseSeen?'✓ Badge débloqué':'🏆 J’y étais !'}</button>
+      <button type="button" id="eclipseBadgeBtn" class="eclipse-badge-btn ${eclipseSeen?'unlocked':''}">${eclipseSeen?'✓ Badge débloqué · retirer':'🏆 J’y étais !'}</button>
       <button type="button" id="eclipseMapBtn" class="eclipse-map-btn">🗺️ Voir sur la carte</button>
     </div>
   </section>`;
@@ -1325,8 +1325,15 @@ function refreshDoneUI(){
 }
 function renderBadges(){
   const list=document.getElementById('badgesList'); if(!list) return;
-  list.innerHTML=badges.map((b,i)=>`<div class="badge-card ${done.includes(i+1)?'':'locked'}"><div class="badge-icon">${b[0]}</div><div><div class="badge-title">${b[1]}</div><div class="badge-sub">${done.includes(i+1)?'Débloqué — Jour '+(i+1):'À débloquer au Jour '+(i+1)}</div></div></div>`).join('') +
-    `<div class="badge-card ${eclipseSeen?'':'locked'}"><div class="badge-icon">🌒</div><div><div class="badge-title">Chasseur d’éclipse</div><div class="badge-sub">${eclipseSeen?'Débloqué — 12 août 2026':'À débloquer avec “J’y étais !”'}</div></div></div>`;
+  const cards=[];
+  badges.forEach((b,i)=>{
+    const day=i+1;
+    cards.push(`<div class="badge-card ${done.includes(day)?'':'locked'}"><div class="badge-icon">${b[0]}</div><div><div class="badge-title">${b[1]}</div><div class="badge-sub">${done.includes(day)?'Débloqué — Jour '+day:'À débloquer au Jour '+day}</div></div></div>`);
+    if(day===8){
+      cards.push(`<button type="button" class="badge-card eclipse-list-card ${eclipseSeen?'':'locked'}" id="eclipseBadgeListBtn" style="width:100%;text-align:left;cursor:pointer;color:inherit"><div class="badge-icon">🌒</div><div><div class="badge-title">Chasseur d’éclipse</div><div class="badge-sub">${eclipseSeen?'Débloqué — 12 août 2026 · toucher pour retirer':'À débloquer le 12 août avec “J’y étais !”'}</div></div></button>`);
+    }
+  });
+  list.innerHTML=cards.join('');
 }
 function celebrateBadge(n){
   const b=badges[n-1]; if(!b) return;
@@ -1353,12 +1360,22 @@ function celebrateEclipseBadge(){
   const box=document.getElementById('badgeCelebration'); box.classList.add('show');
   setTimeout(()=>box.classList.remove('show'),1800);
 }
+function setEclipseSeen(nextValue, celebrate=false){
+  eclipseSeen=Boolean(nextValue);
+  localStorage.setItem(ECLIPSE_STORAGE_KEY,String(eclipseSeen));
+  if(celebrate && eclipseSeen) celebrateEclipseBadge();
+  const badgeBtn=document.getElementById('eclipseBadgeBtn');
+  if(badgeBtn){
+    badgeBtn.textContent=eclipseSeen?'✓ Badge débloqué · retirer':'🏆 J’y étais !';
+    badgeBtn.classList.toggle('unlocked',eclipseSeen);
+  }
+  updateProgress(); renderBadges(); pushFamilyProgress(done);
+}
 document.addEventListener('click',e=>{
   const badgeBtn=e.target.closest('#eclipseBadgeBtn');
-  if(badgeBtn){
-    if(!eclipseSeen){ eclipseSeen=true; localStorage.setItem(ECLIPSE_STORAGE_KEY,'true'); celebrateEclipseBadge(); pushFamilyProgress(done); }
-    badgeBtn.textContent='✓ Badge débloqué'; badgeBtn.classList.add('unlocked'); updateProgress(); renderBadges();
-  }
+  if(badgeBtn){ setEclipseSeen(!eclipseSeen,!eclipseSeen); }
+  const listBtn=e.target.closest('#eclipseBadgeListBtn');
+  if(listBtn){ setEclipseSeen(!eclipseSeen,!eclipseSeen); }
   const mapBtn=e.target.closest('#eclipseMapBtn');
   if(mapBtn){ showTab('map'); setTimeout(()=>focusEclipsePoint(),160); }
 });
@@ -1446,7 +1463,7 @@ function attachFamilyDocument(){
     localStorage.setItem(STORAGE_KEY,JSON.stringify(done));
     localStorage.setItem(ECLIPSE_STORAGE_KEY,String(eclipseSeen));
     refreshDoneUI(); applyingRemote=false;
-    const eclipseBtn=document.getElementById('eclipseBadgeBtn'); if(eclipseBtn){eclipseBtn.textContent=eclipseSeen?'✓ Badge débloqué':'🏆 J’y étais !';eclipseBtn.classList.toggle('unlocked',eclipseSeen);}
+    const eclipseBtn=document.getElementById('eclipseBadgeBtn'); if(eclipseBtn){eclipseBtn.textContent=eclipseSeen?'✓ Badge débloqué · retirer':'🏆 J’y étais !';eclipseBtn.classList.toggle('unlocked',eclipseSeen);}
     refreshPolarstepsUI();
     setSyncState('online','Famille synchronisée');
   },err=>{ console.warn('Écoute Firestore:',err); setSyncState('offline','Sync indisponible'); });
