@@ -688,6 +688,26 @@
   .return-action.is-hidden{display:none;}
   @media(max-width:390px){.stay-return-grid{grid-template-columns:1fr}.return-action{min-height:50px}}
 
+
+  /* Connexion familiale Firebase */
+  .family-login-backdrop{position:fixed;inset:0;z-index:3000;background:linear-gradient(160deg,rgba(10,21,38,.96),rgba(18,33,61,.92));display:none;align-items:center;justify-content:center;padding:24px env(safe-area-inset-right) calc(24px + env(safe-area-inset-bottom)) env(safe-area-inset-left);backdrop-filter:blur(18px)}
+  .family-login-backdrop.open{display:flex}
+  .family-login-card{width:min(100%,430px);background:var(--paper-card);border-radius:26px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.36);border:1px solid rgba(201,160,92,.24)}
+  .family-login-logo{width:58px;height:58px;border-radius:19px;display:grid;place-items:center;font-size:29px;background:linear-gradient(135deg,#6D5DFB,#31C6A2);box-shadow:0 12px 30px rgba(109,93,251,.26);margin-bottom:17px}
+  .family-login-card h2{font-family:'Work Sans',sans-serif;font-size:24px;letter-spacing:-.04em;margin:0 0 7px;color:var(--navy)}
+  .family-login-card>p{font-size:13px;line-height:1.5;color:var(--ink-soft);margin:0 0 19px}
+  .family-field{display:block;margin:0 0 13px}
+  .family-field span{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 6px}
+  .family-field input{width:100%;border:1px solid rgba(18,33,61,.15);background:white;color:var(--ink);border-radius:14px;padding:13px 14px;font:600 15px 'Work Sans',sans-serif;outline:none;box-shadow:0 3px 12px rgba(18,33,61,.04)}
+  .family-field input:focus{border-color:#6D5DFB;box-shadow:0 0 0 4px rgba(109,93,251,.12)}
+  .family-password-wrap{position:relative}.family-password-wrap input{padding-right:54px}
+  .password-toggle{position:absolute;right:7px;bottom:7px;width:40px;height:40px;border:0;border-radius:11px;background:#F0EDFF;cursor:pointer;font-size:17px}
+  .family-login-submit{width:100%;border:0;border-radius:15px;padding:13px 15px;background:linear-gradient(135deg,#6D5DFB,#5040D7);color:white;font:800 14px 'Work Sans',sans-serif;cursor:pointer;box-shadow:0 10px 24px rgba(80,64,215,.24)}
+  .family-login-submit:disabled{opacity:.58;cursor:wait}
+  .family-login-error{min-height:20px;margin:10px 2px 0;color:#B42318;font-size:12px;font-weight:650;line-height:1.4}
+  .family-login-note{margin-top:12px!important;font-size:11px!important;text-align:center;color:var(--ink-soft)!important}
+  .sync-dot.waiting{background:#C9A05C;box-shadow:0 0 0 3px rgba(201,160,92,.17)}
+
 </style>
 </head>
 <body>
@@ -802,6 +822,27 @@
     <button class="sos-close" id="sosCloseBtn">Fermer</button>
   </div>
 </div>
+
+<div id="familyLoginModal" class="family-login-backdrop" role="dialog" aria-modal="true" aria-labelledby="familyLoginTitle">
+  <form id="familyLoginForm" class="family-login-card" autocomplete="on">
+    <div class="family-login-logo">🚗</div>
+    <h2 id="familyLoginTitle">Connexion familiale</h2>
+    <p>Connecte cet iPhone à l’espace RoadTrip Dib pour partager la progression et les badges avec toute la famille.</p>
+    <label class="family-field">
+      <span>Identifiant</span>
+      <input id="familyEmail" type="email" inputmode="email" autocomplete="username" required value="road.trip.2026@famille.dibbo">
+    </label>
+    <label class="family-field family-password-wrap">
+      <span>Mot de passe</span>
+      <input id="familyPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="Mot de passe familial">
+      <button id="familyPasswordToggle" class="password-toggle" type="button" aria-label="Afficher le mot de passe">👁️</button>
+    </label>
+    <button id="familyLoginSubmit" class="family-login-submit" type="submit">Se connecter à la famille</button>
+    <div id="familyLoginError" class="family-login-error" role="alert"></div>
+    <p class="family-login-note">Le mot de passe n’est pas stocké dans l’application. La session est mémorisée par Firebase sur cet iPhone.</p>
+  </form>
+</div>
+
 <div id="toast" class="toast" role="status"></div>
 
 <footer id="listFooter">Touche une case pour cocher un jour • Touche une carte pour l'ouvrir</footer>
@@ -1171,34 +1212,81 @@ document.getElementById('stayCopyBtn').addEventListener('click',async e=>{
   }
 });
 
-let familyDoc=null, applyingRemote=false;
+let familyDoc=null, familyUnsubscribe=null, applyingRemote=false;
+const familyLoginModal=document.getElementById('familyLoginModal');
+const familyLoginForm=document.getElementById('familyLoginForm');
+const familyEmailInput=document.getElementById('familyEmail');
+const familyPasswordInput=document.getElementById('familyPassword');
+const familyLoginError=document.getElementById('familyLoginError');
+const familyLoginSubmit=document.getElementById('familyLoginSubmit');
+
 function setSyncState(state,text){
   const dot=document.getElementById('syncDot'); dot.className='sync-dot '+state;
   document.getElementById('syncLabel').textContent=text;
+}
+function openFamilyLogin(message=''){
+  familyLoginError.textContent=message;
+  familyPasswordInput.value='';
+  familyLoginModal.classList.add('open');
+  setTimeout(()=>familyPasswordInput.focus(),80);
+}
+function closeFamilyLogin(){ familyLoginModal.classList.remove('open'); }
+function firebaseAuthMessage(error){
+  const code=error && error.code || '';
+  if(code==='auth/invalid-credential' || code==='auth/wrong-password' || code==='auth/user-not-found') return 'Identifiant ou mot de passe incorrect.';
+  if(code==='auth/invalid-email') return 'Le format de l’identifiant est incorrect.';
+  if(code==='auth/too-many-requests') return 'Trop d’essais. Patiente quelques minutes avant de recommencer.';
+  if(code==='auth/network-request-failed') return 'Connexion Internet indisponible.';
+  if(code==='auth/operation-not-allowed') return 'La connexion E-mail/Mot de passe doit être activée dans Firebase.';
+  return 'Connexion impossible pour le moment.';
+}
+function attachFamilyDocument(){
+  if(familyUnsubscribe){ familyUnsubscribe(); familyUnsubscribe=null; }
+  familyDoc=firebase.firestore().collection('roadtrips').doc(window.ROADTRIP_FAMILY_CODE || 'dib-europe-2026');
+  familyUnsubscribe=familyDoc.onSnapshot(snap=>{
+    if(!snap.exists){ pushFamilyProgress(done); return; }
+    const remote=(snap.data().done||[]).map(Number);
+    applyingRemote=true; done=[...new Set(remote)].sort((a,b)=>a-b);
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(done)); refreshDoneUI(); applyingRemote=false;
+    setSyncState('online','Famille synchronisée');
+  },err=>{ console.warn('Écoute Firestore:',err); setSyncState('offline','Sync indisponible'); });
 }
 async function initFamilySync(){
   const cfg=window.ROADTRIP_FIREBASE_CONFIG;
   if(!cfg || !cfg.apiKey){ setSyncState('offline','Mode local'); return; }
   try{
-    firebase.initializeApp(cfg);
-    await firebase.auth().signInAnonymously();
-    familyDoc=firebase.firestore().collection('roadtrips').doc(window.ROADTRIP_FAMILY_CODE || 'dib-europe-2026');
-    familyDoc.onSnapshot(snap=>{
-      if(!snap.exists){ pushFamilyProgress(done); return; }
-      const remote=(snap.data().done||[]).map(Number);
-      applyingRemote=true; done=[...new Set(remote)].sort((a,b)=>a-b);
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(done)); refreshDoneUI(); applyingRemote=false;
-      setSyncState('online','Famille synchronisée');
-    },()=>setSyncState('offline','Sync indisponible'));
-  }catch(e){ console.warn('Synchronisation familiale:',e); setSyncState('offline','Mode local'); }
+    if(!firebase.apps.length) firebase.initializeApp(cfg);
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    setSyncState('waiting','Connexion…');
+    firebase.auth().onAuthStateChanged(user=>{
+      if(user){ closeFamilyLogin(); attachFamilyDocument(); }
+      else { familyDoc=null; setSyncState('offline','Connexion requise'); openFamilyLogin(); }
+    });
+  }catch(e){ console.warn('Initialisation Firebase:',e); setSyncState('offline','Mode local'); }
 }
+familyLoginForm.addEventListener('submit',async e=>{
+  e.preventDefault();
+  familyLoginError.textContent=''; familyLoginSubmit.disabled=true; familyLoginSubmit.textContent='Connexion…';
+  try{
+    await firebase.auth().signInWithEmailAndPassword(familyEmailInput.value.trim(),familyPasswordInput.value);
+    closeFamilyLogin();
+  }catch(err){ familyLoginError.textContent=firebaseAuthMessage(err); }
+  finally{ familyLoginSubmit.disabled=false; familyLoginSubmit.textContent='Se connecter à la famille'; }
+});
+document.getElementById('familyPasswordToggle').addEventListener('click',()=>{
+  const show=familyPasswordInput.type==='password';
+  familyPasswordInput.type=show?'text':'password';
+  document.getElementById('familyPasswordToggle').textContent=show?'🙈':'👁️';
+});
 async function pushFamilyProgress(arr){
   if(!familyDoc || applyingRemote) return;
   try{ await familyDoc.set({done:arr,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}); }
-  catch(e){ setSyncState('offline','Sync en attente'); }
+  catch(e){ console.warn('Écriture Firestore:',e); setSyncState('offline','Sync en attente'); }
 }
 document.getElementById('syncBtn').addEventListener('click',()=>{
-  alert(familyDoc ? 'La progression est synchronisée entre les téléphones de la famille.' : 'La synchronisation sera activée après la configuration Firebase. Les données restent enregistrées sur cet iPhone.');
+  const user=firebase.apps.length ? firebase.auth().currentUser : null;
+  if(user) alert('La progression et les badges sont synchronisés entre les téléphones connectés au compte familial.');
+  else openFamilyLogin();
 });
 renderBadges(); initFamilySync();
 

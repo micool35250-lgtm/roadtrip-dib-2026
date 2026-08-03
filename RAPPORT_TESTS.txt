@@ -1,26 +1,8 @@
-ROADTRIP DIB — RAPPORT DE CONTRÔLE V1
-
-Contrôles effectués :
-- 17 journées présentes.
-- 8 hébergements présents avec adresse et horaires.
-- Aucun identifiant HTML dupliqué.
-- Syntaxe JavaScript validée avec Node.js.
-- manifest.webmanifest valide.
-- service worker présent et cache mis à jour.
-- Icônes 192 px et 512 px présentes.
-- Aucun numéro de réservation, code confidentiel ou code de serrure intégré.
-
-Fonctions prévues : itinéraire, carte, météo locale, restaurants, courses,
-SOS, position de voiture, badges et mode local/Firebase.
-
-À contrôler sur iPhone après publication HTTPS : autorisation GPS, affichage
-Leaflet, météo, recherche Overpass et installation sur l’écran d’accueil.
-
-V1.3 — CORRECTION ÉCRAN COURSES
-- Bouton « Trouver des courses autour de moi » déplacé au-dessus de la carte.
-- Bouton visible sur ordinateur et iPhone, sans chevauchement avec SOS/navigation.
-- Message d'autorisation GPS clarifié.
-- Syntaxe JavaScript contrôlée avec Node.js.
-- Manifest JSON validé.
-
-V1.4 : Retour au logement — fenêtre Google Maps / Waze / copie adresse / appel si disponible. Bloc JS dupliqué supprimé.
+ROADTRIP DIB V1.7 — CONTRÔLES
+- Structure complète GitHub Pages présente.
+- Connexion Firebase E-mail/Mot de passe intégrée.
+- Aucun mot de passe stocké dans le code.
+- Persistance Firebase locale activée.
+- Synchronisation Firestore de la progression et des badges conservée.
+- Cache PWA incrémenté : roadtrip-v7-family-login.
+- Validation syntaxique JavaScript effectuée séparément.
