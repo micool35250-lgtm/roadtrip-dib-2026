@@ -547,9 +547,13 @@
   .course-view{display:none;background:var(--paper);min-height:calc(100vh - 172px)}
   .course-view.active{display:block}
   .course-toolbar{max-width:640px;margin:0 auto;padding:14px 16px 8px;display:flex;gap:8px;overflow-x:auto}
+  .course-locate-wrap{max-width:640px;margin:0 auto;padding:6px 16px 12px;text-align:center}
+  .course-locate-btn{width:100%;border:0;border-radius:14px;padding:13px 16px;background:#111827;color:#fff;font:800 13px 'Work Sans',sans-serif;box-shadow:0 8px 20px rgba(17,24,39,.22);cursor:pointer}
+  .course-locate-btn:disabled{opacity:.65;cursor:wait}
+  .course-permission-hint{margin-top:6px;color:var(--ink-soft);font-size:10.5px}
   .filter-chip{border:1px solid var(--line);background:var(--paper-card);color:var(--ink-soft);border-radius:999px;padding:8px 11px;font:600 12px 'Work Sans';white-space:nowrap}
   .filter-chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy)}
-  .course-map-wrap{position:relative;height:calc(100vh - 250px);min-height:410px}
+  .course-map-wrap{position:relative;height:calc(100vh - 330px);min-height:390px}
   #courseMap{height:100%;width:100%}
   .course-status{position:absolute;z-index:500;top:10px;left:12px;right:12px;background:rgba(18,33,61,.93);color:var(--paper);padding:9px 12px;border-radius:9px;font-size:12px;text-align:center}
   .shop-pin{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50% 50% 50% 0;background:#8b4d7d;border:2px solid var(--paper-card);transform:rotate(-45deg);box-shadow:0 2px 5px rgba(18,33,61,.35)}
@@ -729,10 +733,13 @@
     <button class="filter-chip" data-shop="convenience">Épiceries</button>
     <button class="filter-chip" data-shop="butcher">Boucheries</button>
   </div>
+  <div class="course-locate-wrap">
+    <button id="courseLocateBtn" class="course-locate-btn">📍 Trouver des courses autour de moi</button>
+    <div class="course-permission-hint">Safari demandera l’autorisation d’utiliser ta position.</div>
+  </div>
   <div class="course-map-wrap">
-    <div id="courseStatus" class="course-status">Appuie sur « Trouver des courses » pour chercher autour de toi.</div>
+    <div id="courseStatus" class="course-status">Appuie sur le bouton ci-dessus pour afficher les commerces autour de toi.</div>
     <div id="courseMap"></div>
-    <button id="courseLocateBtn" class="locate-btn">🛒 Trouver des courses</button>
   </div>
 </div>
 
@@ -1546,7 +1553,7 @@ document.getElementById('courseLocateBtn').addEventListener('click', () => {
     await searchNearbyShops(lat,lng);
     btn.disabled=false;
   }, err => {
-    btn.disabled=false; btn.textContent='🛒 Trouver des courses';
+    btn.disabled=false; btn.textContent='📍 Trouver des courses autour de moi';
     alert(err.code===1 ? "Localisation refusée. Autorise la position pour Safari dans Réglages." : "Position indisponible : "+err.message);
   }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
 });
@@ -1555,7 +1562,7 @@ async function searchNearbyShops(lat,lng){
   const map=window._courseMap, btn=document.getElementById('courseLocateBtn'), status=document.getElementById('courseStatus');
   if(window._courseMarkers) window._courseMarkers.forEach(m=>map.removeLayer(m));
   window._courseMarkers=[];
-  btn.textContent='🛒 Recherche…'; status.textContent='Recherche des commerces dans un rayon de 1,5 km…';
+  btn.textContent='📍 Recherche en cours…'; status.textContent='Recherche des commerces dans un rayon de 1,5 km…';
   let selector;
   if(courseFilter==='all') selector='[shop~"supermarket|convenience|bakery|butcher|greengrocer"]';
   else selector=`[shop=${courseFilter}]`;
