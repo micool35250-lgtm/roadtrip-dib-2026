@@ -867,6 +867,18 @@
   </div>
 </div>
 <div id="badgeCelebration" class="badge-celebration"><div class="big" id="celebrationIcon">🏆</div><strong id="celebrationTitle"></strong><span>Badge débloqué !</span></div>
+<div id="sosSearchModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sosSearchTitle">
+  <div class="sos-sheet stay-return-sheet">
+    <h2 id="sosSearchTitle">Recherche à proximité</h2>
+    <p id="sosSearchText">Choisis l’application de cartographie.</p>
+    <div class="sos-grid">
+      <a class="sos-action" id="sosAppleSearch" href="#" target="_blank" rel="noopener">🍎 Apple Plans</a>
+      <a class="sos-action gold" id="sosGoogleSearch" href="#" target="_blank" rel="noopener">🗺️ Google Maps</a>
+    </div>
+    <button class="sos-close" id="sosSearchClose">Fermer</button>
+  </div>
+</div>
+
 <div id="sosModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sosTitle">
   <div class="sos-sheet">
     <h2 id="sosTitle">Urgence</h2>
@@ -1810,7 +1822,7 @@ function initCourseMap(){
 }
 
 const courseSearchTerms={
-  all:'courses alimentaires',
+  all:'supermarché',
   supermarket:'supermarché',
   bakery:'boulangerie',
   convenience:'épicerie',
@@ -1823,9 +1835,9 @@ function updateLiveCourseLinks(lat,lng){
   const google=document.getElementById('courseGoogleLive');
   const apple=document.getElementById('courseAppleLive');
   google.href=`https://www.google.com/maps/search/?api=1&query=${q}&center=${lat},${lng}`;
-  apple.href=`https://maps.apple.com/?q=${q}&ll=${lat},${lng}`;
+  apple.href=`https://maps.apple.com/?q=${q}&sll=${lat},${lng}&z=14`;
   document.getElementById('courseLiveActions').classList.add('visible');
-  document.getElementById('courseStatus').textContent=`Position trouvée. Ouvre Google Maps ou Apple Plans pour voir les ${term}s actuellement référencés autour de toi.`;
+  document.getElementById('courseStatus').textContent=`Position trouvée. Choisis Google Maps ou Apple Plans : une recherche « ${term} » sera lancée autour de ta position.`;
 }
 
 document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -1891,8 +1903,24 @@ document.getElementById('copyPositionBtn').addEventListener('click',()=>withCurr
   try{await navigator.clipboard.writeText(text);showToast('📍 Position copiée');}
   catch(e){prompt('Copie cette position :',text);}
 }));
-document.getElementById('hospitalBtn').addEventListener('click',()=>withCurrentPosition((lat,lng)=>window.open(`https://maps.apple.com/?q=hôpital&ll=${lat},${lng}`,'_blank')));
-document.getElementById('pharmacyBtn').addEventListener('click',()=>withCurrentPosition((lat,lng)=>window.open(`https://maps.apple.com/?q=pharmacie&ll=${lat},${lng}`,'_blank')));
+const sosSearchModal=document.getElementById('sosSearchModal');
+function closeSosSearch(){ sosSearchModal.classList.remove('open'); }
+document.getElementById('sosSearchClose').addEventListener('click',closeSosSearch);
+sosSearchModal.addEventListener('click',e=>{if(e.target===sosSearchModal)closeSosSearch()});
+function openNearbyHealthSearch(type){
+  const labels={hospital:{title:'Hôpital proche',query:'hôpital'},pharmacy:{title:'Pharmacie proche',query:'pharmacie'}};
+  const cfg=labels[type];
+  withCurrentPosition((lat,lng)=>{
+    const q=encodeURIComponent(cfg.query);
+    document.getElementById('sosSearchTitle').textContent=cfg.title;
+    document.getElementById('sosSearchText').textContent='Recherche en temps réel autour de ta position actuelle.';
+    document.getElementById('sosAppleSearch').href=`https://maps.apple.com/?q=${q}&sll=${lat},${lng}&z=14`;
+    document.getElementById('sosGoogleSearch').href=`https://www.google.com/maps/search/?api=1&query=${q}&center=${lat},${lng}`;
+    sosSearchModal.classList.add('open');
+  });
+}
+document.getElementById('hospitalBtn').addEventListener('click',()=>openNearbyHealthSearch('hospital'));
+document.getElementById('pharmacyBtn').addEventListener('click',()=>openNearbyHealthSearch('pharmacy'));
 function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 
 

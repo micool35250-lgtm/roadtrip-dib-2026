@@ -1,8 +1,8 @@
-RoadTrip Dib V1.8 — Contrôles
-
-- Navigation arrivée logement : Google Maps, Waze, copie adresse, appel si disponible.
-- Retour logement : mêmes choix conservés.
-- Courses : suppression des points OpenStreetMap potentiellement obsolètes ; recherche géolocalisée ouverte dans Google Maps ou Apple Plans pour des données plus actuelles.
-- Synchronisation Firebase conservée.
-- Syntaxe JavaScript contrôlée.
-- Manifeste et service worker présents.
+RoadTrip Dib V1.11 — contrôles
+- Syntaxe JavaScript validée avec Node.js.
+- Manifeste JSON validé.
+- Service worker présent et cache incrémenté.
+- Boutons Hôpital et Pharmacie reliés à une recherche GPS en temps réel.
+- Liens Apple Plans utilisent q + sll (recherche autour de la position).
+- Liens Google Maps utilisent query + center comme solution parallèle.
+- Archive ZIP vérifiée.

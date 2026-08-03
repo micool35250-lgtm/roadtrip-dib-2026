@@ -26,3 +26,5 @@ VERSION V1.9 - POLARSTEPS
 - Nouvel onglet Polarsteps dans la barre de navigation.
 - Le lien du voyage est synchronisé par Firestore.
 - Il peut être remplacé depuis l'application sans republier GitHub.
+
+V1.11 : les boutons SOS « Hôpital proche » et « Pharmacie proche » utilisent la position GPS au moment de l'appui et proposent Apple Plans ou Google Maps.
