@@ -1,8 +1,8 @@
-ROADTRIP DIB V1.7 — CONTRÔLES
-- Structure complète GitHub Pages présente.
-- Connexion Firebase E-mail/Mot de passe intégrée.
-- Aucun mot de passe stocké dans le code.
-- Persistance Firebase locale activée.
-- Synchronisation Firestore de la progression et des badges conservée.
-- Cache PWA incrémenté : roadtrip-v7-family-login.
-- Validation syntaxique JavaScript effectuée séparément.
+RoadTrip Dib V1.8 — Contrôles
+
+- Navigation arrivée logement : Google Maps, Waze, copie adresse, appel si disponible.
+- Retour logement : mêmes choix conservés.
+- Courses : suppression des points OpenStreetMap potentiellement obsolètes ; recherche géolocalisée ouverte dans Google Maps ou Apple Plans pour des données plus actuelles.
+- Synchronisation Firebase conservée.
+- Syntaxe JavaScript contrôlée.
+- Manifeste et service worker présents.

@@ -21,3 +21,8 @@ La synchronisation reste en mode local tant que firebase-config.js n’est pas c
 
 
 Version moderne : navigation basse, cartes arrondies, nouvelle fiche restaurants et ajout du Tire-Bouchon à Strasbourg.
+
+VERSION V1.9 - POLARSTEPS
+- Nouvel onglet Polarsteps dans la barre de navigation.
+- Le lien du voyage est synchronisé par Firestore.
+- Il peut être remplacé depuis l'application sans republier GitHub.

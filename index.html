@@ -551,6 +551,11 @@
   .course-locate-btn{width:100%;border:0;border-radius:14px;padding:13px 16px;background:#111827;color:#fff;font:800 13px 'Work Sans',sans-serif;box-shadow:0 8px 20px rgba(17,24,39,.22);cursor:pointer}
   .course-locate-btn:disabled{opacity:.65;cursor:wait}
   .course-permission-hint{margin-top:6px;color:var(--ink-soft);font-size:10.5px}
+  .course-live-actions{display:none;max-width:640px;margin:0 auto;padding:0 16px 12px;grid-template-columns:1fr 1fr;gap:10px}
+  .course-live-actions.visible{display:grid}
+  .course-live-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;border-radius:14px;text-decoration:none;font-weight:800;font-size:12.5px;box-shadow:0 7px 18px rgba(18,33,61,.12)}
+  .course-live-link.google{background:#fff;color:#1f2937;border:1px solid rgba(18,33,61,.15)}
+  .course-live-link.apple{background:#111827;color:#fff;border:1px solid #111827}
   .filter-chip{border:1px solid var(--line);background:var(--paper-card);color:var(--ink-soft);border-radius:999px;padding:8px 11px;font:600 12px 'Work Sans';white-space:nowrap}
   .filter-chip.active{background:var(--navy);color:var(--paper);border-color:var(--navy)}
   .course-map-wrap{position:relative;height:calc(100vh - 330px);min-height:390px}
@@ -708,6 +713,31 @@
   .family-login-note{margin-top:12px!important;font-size:11px!important;text-align:center;color:var(--ink-soft)!important}
   .sync-dot.waiting{background:#C9A05C;box-shadow:0 0 0 3px rgba(201,160,92,.17)}
 
+
+  /* Polarsteps */
+  .polar-view{display:none;background:var(--paper);min-height:calc(100vh - 172px);padding:22px 16px 120px}
+  .polar-view.active{display:block}
+  .polar-shell{max-width:640px;margin:0 auto}
+  .polar-hero{background:linear-gradient(145deg,#5b2ca0 0%,#7c3aed 55%,#ec4899 135%);color:white;border-radius:24px;padding:24px;box-shadow:0 18px 44px rgba(91,44,160,.25);position:relative;overflow:hidden}
+  .polar-hero:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12);right:-55px;top:-55px}
+  .polar-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.16em;font-weight:800;opacity:.78;margin-bottom:8px}
+  .polar-hero h2{font-family:'Fraunces',serif;font-size:27px;margin:0 0 8px;position:relative;z-index:1}
+  .polar-hero p{font-size:13px;line-height:1.55;margin:0;max-width:460px;opacity:.9;position:relative;z-index:1}
+  .polar-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;position:relative;z-index:1}
+  .polar-action{border:0;border-radius:15px;padding:13px 12px;font-family:'Work Sans',sans-serif;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none;text-align:center}
+  .polar-open{background:white;color:#5b2ca0}
+  .polar-copy{background:rgba(255,255,255,.16);color:white;border:1px solid rgba(255,255,255,.3)}
+  .polar-info{margin-top:14px;background:var(--paper-card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 6px 22px rgba(17,24,39,.07)}
+  .polar-info h3{font-family:'Fraunces',serif;color:var(--navy);margin:0 0 8px;font-size:17px}
+  .polar-info p{font-size:13px;line-height:1.5;color:var(--ink-soft);margin:0 0 12px}
+  .polar-link-preview{font-size:11px;color:var(--ink-soft);background:rgba(17,24,39,.05);padding:10px;border-radius:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .polar-edit-row{display:flex;gap:8px;margin-top:12px}
+  .polar-edit-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:11px;background:white;font:13px 'Work Sans',sans-serif}
+  .polar-save{border:0;border-radius:12px;padding:11px 13px;background:var(--violet);color:white;font-weight:800}
+  .tab-btn-polar{color:#7c3aed}
+  .tab-btn-polar.active{background:#6d28d9;color:white;box-shadow:0 7px 16px rgba(109,40,217,.25)}
+  @media(max-width:420px){.tabs{gap:2px;padding-left:6px;padding-right:6px}.tab-btn{padding-left:2px;padding-right:2px;font-size:17px}.tab-btn span{font-size:9px}.polar-actions{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -735,6 +765,7 @@
     <button class="tab-btn" data-tab="map" id="tabBtnMap">🗺️<span>Carte</span></button>
     <button class="tab-btn" data-tab="resto" id="tabBtnResto">🍽️<span>Restos</span></button>
     <button class="tab-btn" data-tab="course" id="tabBtnCourse">🛒<span>Courses</span></button>
+    <button class="tab-btn tab-btn-polar" data-tab="polar" id="tabBtnPolar" aria-label="Polarsteps">📸<span>Polar</span></button>
     <button class="tab-btn tab-btn-sos" data-tab="sos" id="tabBtnSos" aria-label="Urgences">🆘<span>SOS</span></button>
   </div>
 </header>
@@ -775,9 +806,36 @@
     <button id="courseLocateBtn" class="course-locate-btn">📍 Trouver des courses autour de moi</button>
     <div class="course-permission-hint">Safari demandera l’autorisation d’utiliser ta position.</div>
   </div>
+  <div id="courseLiveActions" class="course-live-actions" aria-live="polite">
+    <a id="courseGoogleLive" class="course-live-link google" target="_blank" rel="noopener">🗺️ Google Maps</a>
+    <a id="courseAppleLive" class="course-live-link apple" target="_blank" rel="noopener"> Apple Plans</a>
+  </div>
   <div class="course-map-wrap">
     <div id="courseStatus" class="course-status">Appuie sur le bouton ci-dessus pour afficher les commerces autour de toi.</div>
     <div id="courseMap"></div>
+  </div>
+</div>
+
+<div id="polarView" class="polar-view">
+  <div class="polar-shell">
+    <section class="polar-hero">
+      <div class="polar-kicker">Carnet photo familial</div>
+      <h2>Notre voyage sur Polarsteps</h2>
+      <p>Ouvre le carnet du road trip pour consulter les étapes et ajouter des photos depuis l’application Polarsteps.</p>
+      <div class="polar-actions">
+        <a id="polarOpenBtn" class="polar-action polar-open" target="_blank" rel="noopener">📸 Ouvrir Polarsteps</a>
+        <button id="polarCopyBtn" class="polar-action polar-copy" type="button">🔗 Copier le lien</button>
+      </div>
+    </section>
+    <section class="polar-info">
+      <h3>Lien du voyage</h3>
+      <p>Le lien est partagé par Firebase entre les téléphones. Tu peux le remplacer ici plus tard sans republier l’application sur GitHub.</p>
+      <div id="polarLinkPreview" class="polar-link-preview">Chargement du lien…</div>
+      <div class="polar-edit-row">
+        <input id="polarLinkInput" type="url" inputmode="url" autocomplete="off" aria-label="Lien Polarsteps" placeholder="https://www.polarsteps.com/…">
+        <button id="polarSaveBtn" class="polar-save" type="button">Enregistrer</button>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -785,7 +843,7 @@
   <div class="sos-sheet stay-return-sheet">
     <div class="stay-return-sheet-head">
       <div>
-        <div class="stay-return-kicker">Retour au logement</div>
+        <div class="stay-return-kicker" id="stayReturnKicker">Retour au logement</div>
         <h2 id="stayReturnTitle">Logement</h2>
         <p id="stayReturnAddress"></p>
       </div>
@@ -1001,8 +1059,7 @@ function stayEventHtml(event){
       <span>👤 Contact<br><strong>${h.host}</strong></span>
     </div>
     <div class="stay-actions">
-      <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener"> Aller au logement</a>
-      <a class="secondary" href="https://www.google.com/maps/dir/?api=1&destination=${q}" target="_blank" rel="noopener">Google Maps</a>
+      <button type="button" class="stay-return-btn stay-arrival-btn" data-stay-key="${event.key}">🚗 Aller au logement</button>
     </div>
   </div>`;
 }
@@ -1180,9 +1237,10 @@ document.getElementById('badgesModal').addEventListener('click',e=>{if(e.target.
 function closeStayReturnSheet(){
   document.getElementById('stayReturnModal').classList.remove('open');
 }
-function openStayReturnSheet(key){
+function openStayReturnSheet(key, mode='return'){
   const h=stays[key]; if(!h) return;
   const q=encodeURIComponent(h.address);
+  document.getElementById('stayReturnKicker').textContent=mode==='arrival' ? 'Aller au logement' : 'Retour au logement';
   document.getElementById('stayReturnTitle').textContent=h.name;
   document.getElementById('stayReturnAddress').textContent=h.address;
   document.getElementById('stayGoogleBtn').href=`https://www.google.com/maps/dir/?api=1&destination=${q}`;
@@ -1196,7 +1254,7 @@ function openStayReturnSheet(key){
 }
 document.addEventListener('click',e=>{
   const btn=e.target.closest('.stay-return-btn');
-  if(btn) openStayReturnSheet(btn.dataset.stayKey);
+  if(btn) openStayReturnSheet(btn.dataset.stayKey, btn.classList.contains('stay-arrival-btn') ? 'arrival' : 'return');
 });
 document.getElementById('stayReturnClose').addEventListener('click',closeStayReturnSheet);
 document.getElementById('stayReturnX').addEventListener('click',closeStayReturnSheet);
@@ -1212,6 +1270,8 @@ document.getElementById('stayCopyBtn').addEventListener('click',async e=>{
   }
 });
 
+const DEFAULT_POLARSTEPS_URL='https://www.polarsteps.com/MichaelDibbo/27837981-road-trip-2026?referral=true';
+let polarstepsUrl=DEFAULT_POLARSTEPS_URL;
 let familyDoc=null, familyUnsubscribe=null, applyingRemote=false;
 const familyLoginModal=document.getElementById('familyLoginModal');
 const familyLoginForm=document.getElementById('familyLoginForm');
@@ -1244,10 +1304,17 @@ function attachFamilyDocument(){
   if(familyUnsubscribe){ familyUnsubscribe(); familyUnsubscribe=null; }
   familyDoc=firebase.firestore().collection('roadtrips').doc(window.ROADTRIP_FAMILY_CODE || 'dib-europe-2026');
   familyUnsubscribe=familyDoc.onSnapshot(snap=>{
-    if(!snap.exists){ pushFamilyProgress(done); return; }
-    const remote=(snap.data().done||[]).map(Number);
+    if(!snap.exists){
+      familyDoc.set({done,polarstepsUrl:DEFAULT_POLARSTEPS_URL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      polarstepsUrl=DEFAULT_POLARSTEPS_URL; refreshPolarstepsUI(); return;
+    }
+    const data=snap.data()||{};
+    const remote=(data.done||[]).map(Number);
+    polarstepsUrl=(data.polarstepsUrl||DEFAULT_POLARSTEPS_URL).trim();
+    if(!data.polarstepsUrl){ familyDoc.set({polarstepsUrl:DEFAULT_POLARSTEPS_URL},{merge:true}).catch(()=>{}); }
     applyingRemote=true; done=[...new Set(remote)].sort((a,b)=>a-b);
     localStorage.setItem(STORAGE_KEY,JSON.stringify(done)); refreshDoneUI(); applyingRemote=false;
+    refreshPolarstepsUI();
     setSyncState('online','Famille synchronisée');
   },err=>{ console.warn('Écoute Firestore:',err); setSyncState('offline','Sync indisponible'); });
 }
@@ -1290,11 +1357,50 @@ document.getElementById('syncBtn').addEventListener('click',()=>{
 });
 renderBadges(); initFamilySync();
 
+/* ---------- Polarsteps ---------- */
+function validPolarstepsUrl(value){
+  try{
+    const url=new URL(value);
+    return url.protocol==='https:' && (url.hostname==='polarsteps.com' || url.hostname.endsWith('.polarsteps.com'));
+  }catch(e){ return false; }
+}
+function refreshPolarstepsUI(){
+  const url=polarstepsUrl||DEFAULT_POLARSTEPS_URL;
+  const open=document.getElementById('polarOpenBtn');
+  const preview=document.getElementById('polarLinkPreview');
+  const input=document.getElementById('polarLinkInput');
+  if(open) open.href=url;
+  if(preview) preview.textContent=url;
+  if(input && document.activeElement!==input) input.value=url;
+}
+document.getElementById('polarOpenBtn').addEventListener('click',e=>{
+  if(!validPolarstepsUrl(polarstepsUrl)){e.preventDefault();alert('Le lien Polarsteps doit être configuré.');}
+});
+document.getElementById('polarCopyBtn').addEventListener('click',async()=>{
+  if(!validPolarstepsUrl(polarstepsUrl)){alert('Le lien Polarsteps doit être configuré.');return;}
+  try{await navigator.clipboard.writeText(polarstepsUrl);showToast('Lien Polarsteps copié');}
+  catch(e){prompt('Copie ce lien :',polarstepsUrl);}
+});
+document.getElementById('polarSaveBtn').addEventListener('click',async()=>{
+  const input=document.getElementById('polarLinkInput');
+  const value=input.value.trim();
+  if(!validPolarstepsUrl(value)){alert('Saisis un lien Polarsteps valide commençant par https://www.polarsteps.com/');return;}
+  if(!familyDoc){alert('La connexion familiale doit être active pour enregistrer le lien.');return;}
+  const btn=document.getElementById('polarSaveBtn');btn.disabled=true;btn.textContent='Enregistrement…';
+  try{
+    await familyDoc.set({polarstepsUrl:value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    polarstepsUrl=value;refreshPolarstepsUI();showToast('Lien Polarsteps mis à jour');
+  }catch(e){alert('Impossible d’enregistrer le lien pour le moment.');}
+  finally{btn.disabled=false;btn.textContent='Enregistrer';}
+});
+refreshPolarstepsUI();
+
 /* ---------- Tabs ---------- */
 const tabBtnList = document.getElementById('tabBtnList');
 const tabBtnMap = document.getElementById('tabBtnMap');
 const tabBtnResto = document.getElementById('tabBtnResto');
 const tabBtnCourse = document.getElementById('tabBtnCourse');
+const tabBtnPolar = document.getElementById('tabBtnPolar');
 const tabBtnSos = document.getElementById('tabBtnSos');
 let tabBeforeSos = 'list';
 const listView = document.getElementById('listView');
@@ -1302,15 +1408,17 @@ const listFooter = document.getElementById('listFooter');
 const mapView = document.getElementById('mapView');
 const restoView = document.getElementById('restoView');
 const courseView = document.getElementById('courseView');
+const polarView = document.getElementById('polarView');
 
 function showTab(tab){
   tabBeforeSos = tab;
-  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnPolar, tabBtnSos].forEach(b => b.classList.remove('active'));
   listView.style.display = 'none';
   listFooter.style.display = 'none';
   mapView.classList.remove('active');
   restoView.classList.remove('active');
   courseView.classList.remove('active');
+  polarView.classList.remove('active');
 
   if(tab === 'map'){
     tabBtnMap.classList.add('active');
@@ -1326,6 +1434,10 @@ function showTab(tab){
     tabBtnResto.classList.add('active');
     restoView.classList.add('active');
     renderCurated();
+  } else if(tab === 'polar'){
+    tabBtnPolar.classList.add('active');
+    polarView.classList.add('active');
+    refreshPolarstepsUI();
   } else {
     tabBtnList.classList.add('active');
     listView.style.display = 'block';
@@ -1336,8 +1448,9 @@ tabBtnList.addEventListener('click', () => showTab('list'));
 tabBtnMap.addEventListener('click', () => showTab('map'));
 tabBtnResto.addEventListener('click', () => showTab('resto'));
 tabBtnCourse.addEventListener('click', () => showTab('course'));
+tabBtnPolar.addEventListener('click', () => showTab('polar'));
 tabBtnSos.addEventListener('click', () => {
-  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnPolar, tabBtnSos].forEach(b => b.classList.remove('active'));
   tabBtnSos.classList.add('active');
   document.getElementById('sosModal').classList.add('open');
 });
@@ -1683,7 +1796,7 @@ async function searchNearbyRestaurants(lat, lng, map, btn){
 }
 
 
-/* ---------- Courses autour de moi ---------- */
+/* ---------- Courses autour de moi : résultats actualisés via Plans / Google Maps ---------- */
 let courseMapInitialized = false;
 let courseFilter = 'all';
 function initCourseMap(){
@@ -1696,12 +1809,33 @@ function initCourseMap(){
   }).addTo(map);
 }
 
+const courseSearchTerms={
+  all:'courses alimentaires',
+  supermarket:'supermarché',
+  bakery:'boulangerie',
+  convenience:'épicerie',
+  butcher:'boucherie'
+};
+
+function updateLiveCourseLinks(lat,lng){
+  const term=courseSearchTerms[courseFilter] || courseSearchTerms.all;
+  const q=encodeURIComponent(term);
+  const google=document.getElementById('courseGoogleLive');
+  const apple=document.getElementById('courseAppleLive');
+  google.href=`https://www.google.com/maps/search/?api=1&query=${q}&center=${lat},${lng}`;
+  apple.href=`https://maps.apple.com/?q=${q}&ll=${lat},${lng}`;
+  document.getElementById('courseLiveActions').classList.add('visible');
+  document.getElementById('courseStatus').textContent=`Position trouvée. Ouvre Google Maps ou Apple Plans pour voir les ${term}s actuellement référencés autour de toi.`;
+}
+
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     courseFilter = chip.dataset.shop;
-    if(window._lastCoursePosition) searchNearbyShops(window._lastCoursePosition.lat, window._lastCoursePosition.lng);
+    if(window._lastCoursePosition){
+      updateLiveCourseLinks(window._lastCoursePosition.lat, window._lastCoursePosition.lng);
+    }
   });
 });
 
@@ -1709,59 +1843,20 @@ document.getElementById('courseLocateBtn').addEventListener('click', () => {
   if(!navigator.geolocation){ alert("La géolocalisation n'est pas disponible."); return; }
   const btn = document.getElementById('courseLocateBtn');
   btn.disabled = true; btn.textContent = '📍 Localisation…';
-  navigator.geolocation.getCurrentPosition(async pos => {
+  navigator.geolocation.getCurrentPosition(pos => {
     const lat=pos.coords.latitude, lng=pos.coords.longitude;
     window._lastCoursePosition={lat,lng};
     initCourseMap();
     const map=window._courseMap; map.setView([lat,lng],15);
     if(window._courseMe) map.removeLayer(window._courseMe);
-    window._courseMe=L.circleMarker([lat,lng],{radius:7,color:'#3F6C63',fillColor:'#3F6C63',fillOpacity:1,weight:2}).addTo(map).bindPopup('Vous êtes ici');
-    await searchNearbyShops(lat,lng);
-    btn.disabled=false;
+    window._courseMe=L.circleMarker([lat,lng],{radius:8,color:'#3F6C63',fillColor:'#3F6C63',fillOpacity:1,weight:3}).addTo(map).bindPopup('Vous êtes ici').openPopup();
+    updateLiveCourseLinks(lat,lng);
+    btn.disabled=false; btn.textContent='📍 Actualiser ma position';
   }, err => {
     btn.disabled=false; btn.textContent='📍 Trouver des courses autour de moi';
     alert(err.code===1 ? "Localisation refusée. Autorise la position pour Safari dans Réglages." : "Position indisponible : "+err.message);
   }, {enableHighAccuracy:true, timeout:12000, maximumAge:30000});
 });
-
-async function searchNearbyShops(lat,lng){
-  const map=window._courseMap, btn=document.getElementById('courseLocateBtn'), status=document.getElementById('courseStatus');
-  if(window._courseMarkers) window._courseMarkers.forEach(m=>map.removeLayer(m));
-  window._courseMarkers=[];
-  btn.textContent='📍 Recherche en cours…'; status.textContent='Recherche des commerces dans un rayon de 1,5 km…';
-  let selector;
-  if(courseFilter==='all') selector='[shop~"supermarket|convenience|bakery|butcher|greengrocer"]';
-  else selector=`[shop=${courseFilter}]`;
-  const query=`[out:json][timeout:15];(node(around:1500,${lat},${lng})${selector};way(around:1500,${lat},${lng})${selector};);out center 60;`;
-  let data=null;
-  for(const mirror of OVERPASS_MIRRORS){
-    try{
-      const res=await fetchWithTimeout(mirror+'?data='+encodeURIComponent(query),{},7000);
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      data=await res.json(); break;
-    }catch(e){}
-  }
-  if(!data){
-    status.textContent='Service cartographique indisponible. Google Maps peut prendre le relais.';
-    btn.textContent='🛒 Ouvrir Google Maps';
-    btn.onclick=()=>window.open(`https://www.google.com/maps/search/supermarket/@${lat},${lng},15z`,'_blank');
-    return;
-  }
-  const labels={supermarket:'Supermarché',convenience:'Épicerie',bakery:'Boulangerie',butcher:'Boucherie',greengrocer:'Fruits & légumes'};
-  for(const el of (data.elements||[])){
-    const plat=el.lat ?? (el.center&&el.center.lat), plng=el.lon ?? (el.center&&el.center.lon);
-    if(plat==null||plng==null) continue;
-    const tags=el.tags||{}, name=tags.name||labels[tags.shop]||'Commerce', kind=labels[tags.shop]||tags.shop||'Commerce';
-    const icon=L.divIcon({className:'',html:'<div class="shop-pin"><span>🛒</span></div>',iconSize:[25,25],iconAnchor:[12,25]});
-    const apple=`https://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${plat},${plng}`;
-    const google=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&center=${plat},${plng}`;
-    const marker=L.marker([plat,plng],{icon}).addTo(map).bindPopup(`<div class="popup-title">${escapeHtml(name)}</div>${escapeHtml(kind)}<br><a href="${apple}" target="_blank" rel="noopener">Plans</a> · <a href="${google}" target="_blank" rel="noopener">Google Maps</a>`);
-    window._courseMarkers.push(marker);
-  }
-  const count=window._courseMarkers.length;
-  status.textContent=count ? `${count} commerce${count>1?'s':''} trouvé${count>1?'s':''} autour de vous.` : 'Aucun commerce renseigné dans ce rayon. Essaie Google Maps.';
-  btn.textContent=count ? `🛒 ${count} trouvé${count>1?'s':''}` : '🛒 Chercher à nouveau';
-}
 
 function escapeHtml(value){
   return String(value).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -1781,8 +1876,8 @@ function saveCarPosition(){
 const sosModal=document.getElementById('sosModal');
 function closeSosModal(){
   sosModal.classList.remove('open');
-  const activeMap={list:tabBtnList,map:tabBtnMap,resto:tabBtnResto,course:tabBtnCourse};
-  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnSos].forEach(b => b.classList.remove('active'));
+  const activeMap={list:tabBtnList,map:tabBtnMap,resto:tabBtnResto,course:tabBtnCourse,polar:tabBtnPolar};
+  [tabBtnList, tabBtnMap, tabBtnResto, tabBtnCourse, tabBtnPolar, tabBtnSos].forEach(b => b.classList.remove('active'));
   (activeMap[tabBeforeSos] || tabBtnList).classList.add('active');
 }
 document.getElementById('sosCloseBtn').addEventListener('click',closeSosModal);
