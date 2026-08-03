@@ -777,6 +777,15 @@
   .tab-btn-polar.active{background:#6d28d9;color:white;box-shadow:0 7px 16px rgba(109,40,217,.25)}
   @media(max-width:420px){.tabs{gap:2px;padding-left:6px;padding-right:6px}.tab-btn{padding-left:2px;padding-right:2px;font-size:17px}.tab-btn span{font-size:9px}.polar-actions{grid-template-columns:1fr}}
 
+
+  /* V1.18 — circuit complet et temps de route */
+  .route-line{display:flex!important;flex-direction:column;gap:2px;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:10.5px!important;line-height:1.35!important;margin-bottom:13px!important}
+  .route-line span{display:block;text-align:center}
+  .travel-card{display:flex;align-items:center;gap:11px;margin:0 0 13px;padding:11px 12px;border-radius:14px;background:linear-gradient(135deg,rgba(43,108,176,.10),rgba(91,44,160,.08));border:1px solid rgba(43,108,176,.18)}
+  .travel-card-icon{width:36px;height:36px;flex:0 0 36px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--navy);color:#fff;font-size:18px;box-shadow:0 5px 13px rgba(17,35,64,.18)}
+  .travel-card-main{min-width:0;flex:1}.travel-card-route{font-size:12px;font-weight:800;color:var(--navy);line-height:1.25}.travel-card-meta{font-size:11px;color:var(--ink-soft);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}.travel-card-meta strong{color:var(--ink)}
+  @media(max-width:390px){.route-line{font-size:9.5px!important}.travel-card{padding:10px}.travel-card-route{font-size:11.5px}}
+
 </style>
 </head>
 <body>
@@ -784,7 +793,10 @@
 <header>
   <p class="eyebrow">5 — 21 août 2026</p>
   <h1>RoadTrip Dib <span style="font-size:.72em;color:var(--brass-soft)">Europe 2026</span></h1>
-  <p class="route-line">Strasbourg → Europa-Park → Stuttgart → Nuremberg → Leipzig → Berlin → Amsterdam → Bruxelles</p>
+  <div class="route-line" aria-label="Circuit complet">
+    <span>Chevaigné → Strasbourg → Europa-Park → Stuttgart → Nuremberg</span>
+    <span>Leipzig → Berlin → Amsterdam → Bruxelles → Chevaigné</span>
+  </div>
   <div class="progress-wrap">
     <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     <div class="progress-label" id="progressLabel">0 / 17</div>
@@ -967,11 +979,11 @@
 
 <script>
 const days = [
-  { n:1, date:"Mer. 5 août", ville:"Strasbourg", addr:null, addr2:null, prog:[
+  { n:1, date:"Mer. 5 août", ville:"Chevaigné → Strasbourg", addr:null, addr2:null, travel:{route:"Chevaigné → Strasbourg",time:"environ 8 h 15",distance:"environ 850 km"}, prog:[
     {t:"Installation dans le logement"},
     {t:"Balade : Petite France, ponts couverts, barrage Vauban (terrasse panoramique gratuite)"}
   ]},
-  { n:2, date:"Jeu. 6 août", ville:"Strasbourg", addr:null, prog:[
+  { n:2, date:"Jeu. 6 août", ville:"Strasbourg → Rust", addr:null, travel:{route:"Strasbourg → Rust",time:"environ 1 h",distance:"environ 60 km"}, prog:[
     {t:"Matin : cathédrale (entrée gratuite), horloge astronomique, Palais Rohan, place Gutenberg, ruelles du centre"},
     {t:"Déjeuner"},
     {t:"AM : Batorama (embarcadère près du Palais Rohan)"},
@@ -980,12 +992,12 @@ const days = [
   { n:3, date:"Ven. 7 août", ville:"Europa-Park", addr:null, prog:[
     {t:"Journée Europa-Park"}
   ]},
-  { n:4, date:"Sam. 8 août", ville:"Europa-Park", addr:null, prog:[
+  { n:4, date:"Sam. 8 août", ville:"Europa-Park → Stuttgart", addr:null, travel:{route:"Rust → Stuttgart",time:"environ 2 h",distance:"environ 180 km"}, prog:[
     {t:"Journée Europa-Park"},
     {t:"Départ pour Stuttgart (2h)", cls:"strong"},
     {t:"Hôtel : Marbacherstrasse 32"}
   ]},
-  { n:5, date:"Dim. 9 août", ville:"Stuttgart", addr:null, prog:[
+  { n:5, date:"Dim. 9 août", ville:"Stuttgart → Nuremberg", addr:null, travel:{route:"Stuttgart → Nuremberg",time:"environ 2 h 30",distance:"environ 210 km"}, prog:[
     {t:"Matin : musée Mercedes — U-Bahn (VVS) direction Mercedesstrasse / NeckarPark, prendre un billet groupe journée (Gruppentages Ticket)"},
     {t:"Retour : S-Bahn ou U-Bahn vers Stadtmitte"},
     {t:"Balade : Schlossplatz, Königstrasse"},
@@ -998,13 +1010,13 @@ const days = [
     {t:"Déjeuner"},
     {t:"Palais de Justice — Salle 600 (billets groupés déjà achetés, dans le wallet)", cls:"strong"}
   ]},
-  { n:7, date:"Mar. 11 août", ville:"Nuremberg", addr:null, prog:[
+  { n:7, date:"Mar. 11 août", ville:"Nuremberg → Leipzig", addr:null, travel:{route:"Nuremberg → Leipzig",time:"environ 3 h",distance:"environ 290 km"}, prog:[
     {t:"Pas besoin de transport", cls:"italic"},
     {t:"Château impérial (Kaiserburg), descente vers la vieille ville, Hauptmarkt, Belle Fontaine, ruelles médiévales, pont Henkersteg"},
     {t:"Déjeuner : brasserie traditionnelle (Nürnberger Rostbratwürste)"},
     {t:"Départ pour Leipzig", cls:"strong"}
   ]},
-  { n:8, date:"Mer. 12 août", ville:"Leipzig", addr:null, eclipse:true, prog:[
+  { n:8, date:"Mer. 12 août", ville:"Leipzig → Berlin", addr:null, eclipse:true, travel:{route:"Leipzig → Berlin",time:"environ 2 h",distance:"environ 190 km"}, prog:[
     {t:"Nikolaikirche, Augustusplatz, quartier de Plagwitz"},
     {t:"Départ pour Berlin (2h)", cls:"strong"},
     {t:"Télécharger BVG Fahrinfo et DB Navigator ; si besoin, ticket groupe journée (jusqu'à 5 pers.)"}
@@ -1037,7 +1049,7 @@ const days = [
     {t:"RAW-Gelände"},
     {t:"Kreuzberg, Friedrichshain"}
   ]},
-  { n:13, date:"Lun. 17 août", ville:"Berlin → Amsterdam", addr:null, addr2:null, prog:[
+  { n:13, date:"Lun. 17 août", ville:"Berlin → Amsterdam", addr:null, addr2:null, travel:{route:"Berlin → Amsterdam",time:"environ 6 h 30",distance:"environ 655 km"}, prog:[
     {t:"Matin : Sachsenhausen, camp de concentration — gratuit, sans réservation, audioguides sur place"},
     {t:"Départ pour Amsterdam", cls:"strong"}
   ]},
@@ -1048,7 +1060,7 @@ const days = [
     {t:"Les Neuf Rues : friperies, boutiques originales, rues photogéniques"},
     {t:"AM : croisière sur les canaux, balade dans le quartier rouge"}
   ]},
-  { n:15, date:"Mer. 19 août", ville:"Bruxelles", addr:null, prog:[
+  { n:15, date:"Mer. 19 août", ville:"Amsterdam → Bruxelles", addr:null, travel:{route:"Amsterdam → Bruxelles",time:"environ 2 h 30",distance:"environ 210 km"}, prog:[
     {t:"Départ pour Bruxelles", cls:"strong"},
     {t:"Place Sainte-Catherine"},
     {t:"Dîner sur la Grand-Place"}
@@ -1063,7 +1075,7 @@ const days = [
     {t:"Gaston — rue de l'Écuyer"},
     {t:"Boule et Bill — rue du Chevreuil"}
   ]},
-  { n:17, date:"Ven. 21 août", ville:"Bruxelles → Chevaigné", addr:"Retour à la maison", addr2:"Chemin inverse jusqu'à Chevaigné", prog:[
+  { n:17, date:"Ven. 21 août", ville:"Bruxelles → Chevaigné", addr:"Retour à la maison", addr2:"Chemin inverse jusqu'à Chevaigné", travel:{route:"Bruxelles → Chevaigné",time:"environ 7 h",distance:"environ 700 km"}, prog:[
     {t:"Route du retour, Bruxelles → Chevaigné", cls:"strong"}
   ]}
 
@@ -1168,6 +1180,17 @@ function eclipseCardHtml(){
   </section>`;
 }
 
+function travelCardHtml(travel){
+  if(!travel) return '';
+  return `<div class="travel-card" aria-label="Temps de trajet estimé">
+    <div class="travel-card-icon">🚗</div>
+    <div class="travel-card-main">
+      <div class="travel-card-route">${travel.route}</div>
+      <div class="travel-card-meta"><span>⏱️ <strong>${travel.time}</strong></span><span>📏 <strong>${travel.distance}</strong></span></div>
+    </div>
+  </div>`;
+}
+
 const badges = [
   ["🥨","Explorateur de Strasbourg"],["⛪","Maître de la cathédrale"],["🎢","Survivant d’Europa-Park"],["🎠","Double dose de sensations"],
   ["🚘","Pilote de Stuttgart"],["📜","Gardien de la mémoire"],["🏰","Chevalier de Nuremberg"],["🎨","Éclaireur de Leipzig"],
@@ -1231,6 +1254,7 @@ days.forEach(d => {
       </div>
       <div class="card-body">
         <div class="card-body-inner">
+          ${travelCardHtml(d.travel)}
           ${stayHtml(d.n)}
           ${addrHtml}
           <ul class="prog">${progItems}</ul>

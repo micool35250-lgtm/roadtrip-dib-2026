@@ -1,14 +1,10 @@
-V1.14 — contrôles effectués
-- Structure HTML : présente
-- Filtres carte : Tout / Logements / Visites / Restos
-- 8 hébergements cartographiés
-- Restaurants sélectionnés cartographiés
-- Principales visites du programme cartographiées
-- Liens Apple Plans / Google Maps / Waze générés
-- Cache PWA mis à jour
-- Syntaxe JavaScript contrôlée séparément
+RoadTrip Dib V1.18 — Contrôles
 
-V1.15 : ajout de Rüyam Gemüse Kebab et Mustafa’s Gemüse Kebap à Berlin ; ajout automatique sur la carte via le filtre Restos.
+- 17 journées présentes.
+- 9 grands trajets avec durée et distance estimées.
+- circuit aller-retour complet sur deux lignes.
+- syntaxe JavaScript validée.
+- manifest et service worker présents.
+- archive ZIP testée.
 
-
-V1.16 : ajout éclipse, badge manuel synchronisé, marqueur carte, cache PWA v16.
+Les durées sont indicatives et peuvent varier selon le trafic, les pauses et les travaux.
