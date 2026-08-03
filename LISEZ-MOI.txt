@@ -7,3 +7,6 @@ Déploiement : téléverser tout le contenu de ce dossier à la racine du dépô
 
 
 V1.16 : encart éclipse solaire du 12 août, badge Chasseur d’éclipse synchronisé et point d’observation sur la carte.
+
+
+V1.17 : correction de la fenêtre Badges (ouverture en haut, défilement mobile).
