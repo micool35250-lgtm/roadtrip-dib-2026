@@ -22,3 +22,5 @@ V1.3 — CORRECTION ÉCRAN COURSES
 - Message d'autorisation GPS clarifié.
 - Syntaxe JavaScript contrôlée avec Node.js.
 - Manifest JSON validé.
+
+V1.4 : Retour au logement — fenêtre Google Maps / Waze / copie adresse / appel si disponible. Bloc JS dupliqué supprimé.

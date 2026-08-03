@@ -668,8 +668,23 @@
   .stay-mini-link{flex:0 0 auto;text-decoration:none;background:var(--navy);color:var(--paper);padding:8px 10px;border-radius:10px;font-size:11.5px;font-weight:700;}
 
   .stay-return-only{margin:10px 0 2px;display:flex;}
-  .stay-return-only a{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:linear-gradient(135deg,var(--navy),#243A63);color:var(--paper);padding:11px 14px;border-radius:13px;font-size:12.5px;font-weight:800;box-shadow:0 4px 12px rgba(18,33,61,.16);}
   .stay-return-only a:active{transform:scale(.985);}
+  .stay-return-only .stay-return-btn{border:0;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--navy),#243A63);color:var(--paper);padding:11px 14px;border-radius:13px;font:800 12.5px 'Work Sans',sans-serif;box-shadow:0 4px 12px rgba(18,33,61,.16);cursor:pointer;}
+  .stay-return-only .stay-return-btn:active{transform:scale(.985);}
+  .stay-return-sheet{max-width:520px;}
+  .stay-return-sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .stay-return-sheet-head h2{margin:2px 0 3px;}
+  .stay-return-sheet-head p{margin:0;line-height:1.35;}
+  .stay-return-kicker{text-transform:uppercase;letter-spacing:.11em;font-size:10px;font-weight:800;color:var(--gold);}
+  .sheet-x{border:0;background:rgba(18,33,61,.08);color:var(--navy);width:34px;height:34px;border-radius:50%;font-size:23px;line-height:1;cursor:pointer;}
+  .stay-return-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 14px;}
+  .return-action{min-height:58px;border:0;border-radius:16px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;font:800 13px 'Work Sans',sans-serif;cursor:pointer;box-sizing:border-box;}
+  .return-action.google{background:#eef3ff;color:#23458b;}
+  .return-action.waze{background:#eafcff;color:#075d68;}
+  .return-action.copy{background:#f5f0ff;color:#553090;}
+  .return-action.call{background:#edf9f0;color:#166534;}
+  .return-action.is-hidden{display:none;}
+  @media(max-width:390px){.stay-return-grid{grid-template-columns:1fr}.return-action{min-height:50px}}
 
 </style>
 </head>
@@ -743,6 +758,25 @@
   </div>
 </div>
 
+<div id="stayReturnModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="stayReturnTitle">
+  <div class="sos-sheet stay-return-sheet">
+    <div class="stay-return-sheet-head">
+      <div>
+        <div class="stay-return-kicker">Retour au logement</div>
+        <h2 id="stayReturnTitle">Logement</h2>
+        <p id="stayReturnAddress"></p>
+      </div>
+      <button type="button" class="sheet-x" id="stayReturnX" aria-label="Fermer">×</button>
+    </div>
+    <div class="stay-return-grid">
+      <a id="stayGoogleBtn" class="return-action google" target="_blank" rel="noopener">🗺️ <span>Google Maps</span></a>
+      <a id="stayWazeBtn" class="return-action waze" target="_blank" rel="noopener">🚗 <span>Waze</span></a>
+      <button type="button" id="stayCopyBtn" class="return-action copy">📋 <span>Copier l’adresse</span></button>
+      <a id="stayCallBtn" class="return-action call" href="#">📞 <span>Appeler</span></a>
+    </div>
+    <button class="sos-close" id="stayReturnClose">Fermer</button>
+  </div>
+</div>
 <div id="badgesModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="badgesTitle">
   <div class="sos-sheet">
     <h2 id="badgesTitle">Badges du voyage</h2>
@@ -876,13 +910,13 @@ const days = [
 
 const stays = {
   strasbourg:{name:"Logement Strasbourg",address:"13 Rue Jean-Paul de Dadelsen, 67200 Strasbourg, France",checkin:"5 août · après 15 h",checkout:"7 août · avant 11 h",access:"Serrure connectée",parking:"Stationnement à vérifier sur place",host:"Hôte : Arc"},
-  rust:{name:"Pension Mimosa",address:"Hindenburgstraße 3, 77977 Rust, Allemagne",checkin:"7 août · 17 h–22 h",checkout:"8 août · 8 h–10 h 30",access:"Accueil de la pension",parking:"Parking inclus",host:"Téléphone : +49 176 72149188"},
+  rust:{name:"Pension Mimosa",address:"Hindenburgstraße 3, 77977 Rust, Allemagne",checkin:"7 août · 17 h–22 h",checkout:"8 août · 8 h–10 h 30",access:"Accueil de la pension",parking:"Parking inclus",host:"Téléphone : +49 176 72149188",phone:"+4917672149188"},
   stuttgart:{name:"Hotel Allee 25",address:"Marbacher Straße 32, 70435 Stuttgart, Allemagne",checkin:"8 août · après 14 h",checkout:"9 août · avant 12 h",access:"Boîte à clés sécurisée",parking:"Parking gratuit indiqué dans l’annonce",host:"Hôte : Hotel Allee 25"},
   nuremberg:{name:"Logement de Sven",address:"Tafelfeldstraße 21, 90443 Nürnberg, Allemagne",checkin:"9 août · après 14 h",checkout:"11 août · avant 11 h",access:"Boîte à clés sécurisée",parking:"Places devant la maison et le long de la rue",host:"Hôte : Sven"},
   leipzig:{name:"Appartement d’Olga",address:"Seelenbinderstraße 4, 04159 Leipzig, Allemagne",checkin:"11 août · après 15 h",checkout:"12 août · avant 10 h",access:"Boîte à clés sécurisée",parking:"Place de stationnement incluse",host:"Hôte : Olga"},
   berlin:{name:"East Side Apartment",address:"Pflugstraße 4, 10115 Berlin, Allemagne",checkin:"12 août · après 15 h",checkout:"17 août · avant 11 h",access:"Serrure connectée",parking:"Utiliser “J’ai garé la voiture ici”",host:"Hôte : Stefan"},
-  amsterdam:{name:"MEININGER Hotel Amsterdam Amstel",address:"Julianaplein 6, 1097 DN Amsterdam, Pays-Bas",checkin:"17 août · après 15 h",checkout:"19 août · avant 11 h",access:"Réception de l’hôtel",parking:"Vérifier les conditions de l’hôtel",host:"Téléphone : +31 20 808 3102"},
-  brussels:{name:"Citadines Sainte-Catherine Brussels",address:"51 Quai au Bois à Brûler, 1000 Bruxelles, Belgique",checkin:"19 août · après 15 h",checkout:"21 août · avant 11 h",access:"Réception de l’établissement",parking:"Vérifier les conditions de l’établissement",host:"Téléphone : +32 2 221 14 11"}
+  amsterdam:{name:"MEININGER Hotel Amsterdam Amstel",address:"Julianaplein 6, 1097 DN Amsterdam, Pays-Bas",checkin:"17 août · après 15 h",checkout:"19 août · avant 11 h",access:"Réception de l’hôtel",parking:"Vérifier les conditions de l’hôtel",host:"Téléphone : +31 20 808 3102",phone:"+31208083102"},
+  brussels:{name:"Citadines Sainte-Catherine Brussels",address:"51 Quai au Bois à Brûler, 1000 Bruxelles, Belgique",checkin:"19 août · après 15 h",checkout:"21 août · avant 11 h",access:"Réception de l’établissement",parking:"Vérifier les conditions de l’établissement",host:"Téléphone : +32 2 221 14 11",phone:"+3222211411"}
 };
 
 const stayEvents = {
@@ -950,9 +984,8 @@ function stayReturnHtml(dayNumber){
   const key=stayReturnByDay[dayNumber];
   const h=stays[key];
   if(!h) return '';
-  const q=encodeURIComponent(h.address);
   return `<div class="stay-return-only">
-    <a href="https://maps.apple.com/?q=${q}" target="_blank" rel="noopener">🏠 Retour au logement</a>
+    <button type="button" class="stay-return-btn" data-stay-key="${key}">🏠 Retour au logement</button>
   </div>`;
 }
 
@@ -1100,6 +1133,41 @@ function celebrateBadge(n){
 document.getElementById('badgesBtn').addEventListener('click',()=>{renderBadges();document.getElementById('badgesModal').classList.add('open')});
 document.getElementById('badgesCloseBtn').addEventListener('click',()=>document.getElementById('badgesModal').classList.remove('open'));
 document.getElementById('badgesModal').addEventListener('click',e=>{if(e.target.id==='badgesModal')e.currentTarget.classList.remove('open')});
+
+function closeStayReturnSheet(){
+  document.getElementById('stayReturnModal').classList.remove('open');
+}
+function openStayReturnSheet(key){
+  const h=stays[key]; if(!h) return;
+  const q=encodeURIComponent(h.address);
+  document.getElementById('stayReturnTitle').textContent=h.name;
+  document.getElementById('stayReturnAddress').textContent=h.address;
+  document.getElementById('stayGoogleBtn').href=`https://www.google.com/maps/dir/?api=1&destination=${q}`;
+  document.getElementById('stayWazeBtn').href=`https://www.waze.com/ul?q=${q}&navigate=yes`;
+  const call=document.getElementById('stayCallBtn');
+  if(h.phone){ call.href=`tel:${h.phone}`; call.classList.remove('is-hidden'); }
+  else { call.removeAttribute('href'); call.classList.add('is-hidden'); }
+  const copy=document.getElementById('stayCopyBtn');
+  copy.dataset.address=h.address;
+  document.getElementById('stayReturnModal').classList.add('open');
+}
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.stay-return-btn');
+  if(btn) openStayReturnSheet(btn.dataset.stayKey);
+});
+document.getElementById('stayReturnClose').addEventListener('click',closeStayReturnSheet);
+document.getElementById('stayReturnX').addEventListener('click',closeStayReturnSheet);
+document.getElementById('stayReturnModal').addEventListener('click',e=>{if(e.target.id==='stayReturnModal') closeStayReturnSheet();});
+document.getElementById('stayCopyBtn').addEventListener('click',async e=>{
+  const address=e.currentTarget.dataset.address || '';
+  try{
+    await navigator.clipboard.writeText(address);
+    showToast('Adresse copiée');
+  }catch(err){
+    const area=document.createElement('textarea'); area.value=address; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+    showToast('Adresse copiée');
+  }
+});
 
 let familyDoc=null, applyingRemote=false;
 function setSyncState(state,text){
