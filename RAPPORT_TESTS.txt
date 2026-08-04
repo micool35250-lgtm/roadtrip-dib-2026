@@ -1,14 +1,7 @@
-V1.14 — contrôles effectués
-- Structure HTML : présente
-- Filtres carte : Tout / Logements / Visites / Restos
-- 8 hébergements cartographiés
-- Restaurants sélectionnés cartographiés
-- Principales visites du programme cartographiées
-- Liens Apple Plans / Google Maps / Waze générés
-- Cache PWA mis à jour
-- Syntaxe JavaScript contrôlée séparément
+RoadTrip Dib V1.20 — correction Polarsteps
 
-V1.15 : ajout de Rüyam Gemüse Kebab et Mustafa’s Gemüse Kebap à Berlin ; ajout automatique sur la carte via le filtre Restos.
-
-
-V1.16 : ajout éclipse, badge manuel synchronisé, marqueur carte, cache PWA v16.
+- Le bouton principal Polarsteps lit toujours le lien courant affiché/enregistré.
+- Il ne dépend plus d'un href ancien conservé par le cache Safari/PWA.
+- Le lien copié et le lien ouvert utilisent désormais la même valeur.
+- Syntaxe JavaScript contrôlée.
+- Archive ZIP contrôlée.

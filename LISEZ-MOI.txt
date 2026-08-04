@@ -1,12 +1,9 @@
-ROADTRIP DIB 2026 — V1.14 CARTE COMPLÈTE
+RoadTrip Dib 2026 — V1.19
 
-Nouveauté : la carte affiche l’itinéraire, les 8 hébergements, les restaurants sélectionnés et les principaux lieux du programme.
-Filtres : Tout, Logements, Visites, Restos. Chaque fiche propose Apple Plans, Google Maps et Waze.
+Mise à jour :
+- circuit complet affiché sur deux lignes sur l’écran d’accueil ;
+- Jour 1 renommé Chevaigné → Strasbourg ;
+- temps et distances estimés ajoutés aux grandes journées de route ;
+- toutes les fonctions précédentes sont conservées.
 
-Déploiement : téléverser tout le contenu de ce dossier à la racine du dépôt GitHub Pages.
-
-
-V1.16 : encart éclipse solaire du 12 août, badge Chasseur d’éclipse synchronisé et point d’observation sur la carte.
-
-
-V1.17 : correction de la fenêtre Badges (ouverture en haut, défilement mobile).
+Pour GitHub Pages : téléverser tout le contenu de ce dossier à la racine du dépôt.
