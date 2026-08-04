@@ -1,10 +1,7 @@
-RoadTrip Dib V1.19 — Contrôles
+RoadTrip Dib V1.20 — correction Polarsteps
 
-- 17 journées présentes.
-- 9 grands trajets avec durée et distance estimées.
-- circuit aller-retour complet sur deux lignes.
-- syntaxe JavaScript validée.
-- manifest et service worker présents.
-- archive ZIP testée.
-
-Les durées sont indicatives et peuvent varier selon le trafic, les pauses et les travaux.
+- Le bouton principal Polarsteps lit toujours le lien courant affiché/enregistré.
+- Il ne dépend plus d'un href ancien conservé par le cache Safari/PWA.
+- Le lien copié et le lien ouvert utilisent désormais la même valeur.
+- Syntaxe JavaScript contrôlée.
+- Archive ZIP contrôlée.

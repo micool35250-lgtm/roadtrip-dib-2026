@@ -1524,7 +1524,15 @@ function refreshPolarstepsUI(){
   if(input && document.activeElement!==input) input.value=url;
 }
 document.getElementById('polarOpenBtn').addEventListener('click',e=>{
-  if(!validPolarstepsUrl(polarstepsUrl)){e.preventDefault();alert('Le lien Polarsteps doit être configuré.');}
+  e.preventDefault();
+  const input=document.getElementById('polarLinkInput');
+  const displayed=input ? input.value.trim() : '';
+  const currentUrl=validPolarstepsUrl(displayed) ? displayed : polarstepsUrl;
+  if(!validPolarstepsUrl(currentUrl)){alert('Le lien Polarsteps doit être configuré.');return;}
+  polarstepsUrl=currentUrl;
+  refreshPolarstepsUI();
+  const opened=window.open(currentUrl,'_blank','noopener,noreferrer');
+  if(!opened) window.location.href=currentUrl;
 });
 document.getElementById('polarCopyBtn').addEventListener('click',async()=>{
   if(!validPolarstepsUrl(polarstepsUrl)){alert('Le lien Polarsteps doit être configuré.');return;}
